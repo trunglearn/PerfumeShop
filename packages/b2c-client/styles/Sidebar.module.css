@@ -1,0 +1,139 @@
+.sidebar {
+    background: #ffffff !important;
+    position: fixed;
+    left: 24px;
+    top: 24px;
+    bottom: 24px;
+    width: 260px;
+    padding: 10px;
+    overflow-y: auto;
+    /* border: 1px solid red; */
+}
+
+.searchSection {
+    margin-bottom: 16px;
+}
+
+.menuSection,
+.filterSection {
+    margin-bottom: 24px;
+}
+
+.menuTitle {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.menuTitleText {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.selectedItem {
+    font-weight: bold;
+    @apply !text-primary;
+}
+
+.filterTitle {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.filterCategory {
+    font-weight: bold;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.ant-menu-item {
+    padding-left: 24px !important;
+}
+
+.toggleButton {
+    width: 100%;
+    text-align: left;
+    padding-left: 0;
+}
+
+.divider {
+    margin: 20px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.sortSection {
+    margin-top: 16px;
+}
+
+.sortText {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.menuItem {
+    padding-left: 24px !important;
+}
+
+.active {
+    background-color: #f0f0f0;
+}
+
+.latestProductsSection {
+    margin-top: 20px;
+}
+
+.menuTitle {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.menuTitleText {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.resetButton {
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+    @apply bg-primary;
+}
+
+.resetButton:hover {
+    background-color: #d41a1a !important;
+    color: #fff !important;
+}
+
+.contactsSection {
+    margin-top: 20px;
+}
+
+.contactList {
+    list-style: none;
+    padding: 5px 0;
+    padding-left: 10px;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contactList li {
+    margin-bottom: 8px;
+}
+
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkbox {
+    margin-bottom: 8px;
+}

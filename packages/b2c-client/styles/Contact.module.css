@@ -1,0 +1,93 @@
+.container {
+    padding: 40px;
+    background-color: #f9f9f9;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.title {
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+}
+
+.infoRow {
+    margin-bottom: 60px;
+}
+
+.infoCol {
+    text-align: center;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.infoCol:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+    font-size: 48px;
+    color: #1890ff;
+    margin-bottom: 20px;
+}
+
+.methodTitle {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.text {
+    font-size: 16px;
+    color: #555;
+}
+
+.formRow {
+    display: flex;
+    justify-content: center;
+}
+
+.formTitle {
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form .ant-form-item {
+    margin-bottom: 20px;
+}
+
+.form .ant-input, .form .ant-input-textarea {
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    transition: border-color 0.3s ease;
+}
+
+.form .ant-input:hover, .form .ant-input:focus, .form .ant-input-textarea:hover, .form .ant-input-textarea:focus {
+    border-color: #1890ff;
+}
+
+.form .submitButton {
+    width: 100%;
+    border-radius: 4px;
+    background-color: #1890ff;
+    border-color: #1890ff;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+}

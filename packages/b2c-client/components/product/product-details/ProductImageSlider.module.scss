@@ -1,0 +1,11 @@
+.mySwiper {
+    :global {
+        .swiper-slide-thumb-active {
+            @apply opacity-100;
+
+            img {
+                @apply border-primary;
+            }
+        }
+    }
+}

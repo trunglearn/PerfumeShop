@@ -1,0 +1,19 @@
+.feedbackForm {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.productNameInput {
+    font-weight: bold;
+    color: #000;
+}
+
+.submitButton {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    font-size: 16px;
+}
+

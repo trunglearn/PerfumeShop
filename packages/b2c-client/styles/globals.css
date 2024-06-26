@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+:root {
+    height: 100%;
+}
+
+.animation-fade-in {
+    transition: 0.5s all ease;
+    animation-name: toTop;
+    animation-duration: 2s;
+    animation-direction: normal;
+    position: relative;
+}
+@keyframes toTop {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@layer base {
+    html {
+        @apply text-sm text-slate-700;
+    }
+}
+
+.customScroll {
+    overflow-y: auto;
+}
+.customScroll::-webkit-scrollbar {
+    width: 4px;
+    border-radius: 50px;
+}
+.customScroll::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+    border-radius: 50px;
+    background-color: #dfdfdf;
+}
+.customScroll::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+    background-color: #8f9f9b;
+    border-radius: 50px;
+}

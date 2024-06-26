@@ -1,0 +1,24 @@
+.layout {
+    background-color: #ffffff;
+}
+
+.content {
+    background-color: #ffffff;
+    min-height: calc(100vh - 64px);
+    max-width: 1200px;
+    width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.blogGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.gridItem {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}

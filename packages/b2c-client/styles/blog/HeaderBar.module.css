@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    margin: 0 100px;
+    gap: 40px;
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+.mainLayout {
+    flex: 1;
+}
+
+.content {
+    background: #fff;
+    min-height: 280px;
+}
+
+.blogTitle {
+    background: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}

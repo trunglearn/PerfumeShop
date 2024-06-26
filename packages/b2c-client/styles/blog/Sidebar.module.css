@@ -1,0 +1,68 @@
+.sidebar {
+    background: #ffffff !important;
+    position: fixed;
+    left: 24px;
+    top: 24px;
+    bottom: 24px;
+    width: 260px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.searchSection {
+    margin-bottom: 16px;
+}
+
+.menuSection {
+    margin-bottom: 24px;
+}
+
+.menuTitle {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.menuTitleText {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.divider {
+    margin: 20px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.toggleButton {
+    width: 100%;
+    text-align: left;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.latestBlogsSection {
+    margin-top: 20px;
+}
+
+.contactsSection {
+    margin-top: 20px;
+}
+
+.contactList {
+    list-style: none;
+    padding: 5px 0;
+    padding-left: 10px;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contactList li {
+    margin-bottom: 8px;
+}
+
+.contactDetailButton {
+    background: none;
+    border: none;
+    color: blue;
+    cursor: pointer;
+}

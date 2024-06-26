@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+:root {
+    height: 100%;
+}
+
+@layer base {
+    html {
+        @apply text-sm text-slate-700;
+    }
+    /* Use Tailwind utilities for scrollbar styles */
+    ::-webkit-scrollbar {
+        @apply h-2 w-2;
+    }
+
+    /* Style the scrollbar track */
+    ::-webkit-scrollbar-track {
+        @apply bg-[#f1f1f1];
+    }
+
+    /* Style the scrollbar thumb */
+    ::-webkit-scrollbar-thumb {
+        @apply rounded-lg bg-slate-400;
+    }
+
+    /* Style the scrollbar thumb when hovering */
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-slate-500;
+    }
+}
