@@ -19,6 +19,7 @@ import useCartStore from '~/hooks/useCartStore';
 import { useAuth } from '~/hooks/useAuth';
 import { useCartQuery } from '~/hooks/useCartQuery';
 import Feedback from './feedback';
+import Comment from './comment';
 
 type Props = {
     data?: Product;
@@ -73,11 +74,12 @@ const ProductDetail: React.FC<Props> = ({ data }) => {
     }, [data?.id]);
 
     useLayoutEffect(() => {
-        if (buyQuantity <= 0) {
-            setByQuantity(1);
-        }
-        if (data?.quantity && buyQuantity > data?.quantity) {
-            setByQuantity(data?.quantity);
+        if (data?.quantity && data?.quantity >= 0) {
+            if (buyQuantity <= 0) {
+                setByQuantity(1);
+            } else if (data?.quantity && buyQuantity > data?.quantity) {
+                setByQuantity(data?.quantity);
+            }
         }
     }, [buyQuantity, data?.quantity]);
 
@@ -146,6 +148,7 @@ const ProductDetail: React.FC<Props> = ({ data }) => {
                                     </span>
                                     <span>
                                         <Rate
+                                            allowHalf
                                             className="text-primary"
                                             disabled
                                             value={data?.rating ?? 0}
@@ -221,7 +224,10 @@ const ProductDetail: React.FC<Props> = ({ data }) => {
                             </div>
                         </div>
                         <div className="text-slate-500">
-                            {data?.quantity ?? 0} sản phẩm có sẵn
+                            {data?.quantity && data?.quantity > 0
+                                ? data?.quantity
+                                : 0}{' '}
+                            sản phẩm có sẵn
                         </div>
                     </div>
                     <div>
@@ -278,6 +284,9 @@ const ProductDetail: React.FC<Props> = ({ data }) => {
                     productId={data?.id ?? ''}
                     productRate={data?.rating ?? 0}
                 />
+            </div>
+            <div className="mt-10">
+                <Comment productId={data?.id ?? ''} />
             </div>
         </div>
     );

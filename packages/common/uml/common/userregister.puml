@@ -1,0 +1,32 @@
+@startuml
+
+actor User
+participant "RegistrationPopup" as RegistrationPopup
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+participant "EmailService" as EmailService
+
+User -> RegistrationPopup: Open Registration Pop-up
+RegistrationPopup -> Controller: Request Registration Form
+Controller -> Model: Fetch Registration Form
+Model -> Controller: Send Registration Form
+Controller -> RegistrationPopup: Display Registration Form
+
+User -> RegistrationPopup: Submit Registration Information (full name, gender, email, mobile, address)
+RegistrationPopup -> Controller: Submit Registration Information
+Controller -> Model: Save Registration Information
+Model -> Database: Store Registration Information
+Model -> Controller: Confirm Registration
+Controller -> EmailService: Send Verification Email
+EmailService -> User: Send Verification Link
+
+User -> EmailService: Click Verification Link
+EmailService -> Controller: Verify Registration Link
+Controller -> Model: Validate Verification Link
+Model -> Database: Update User Status to Verified
+Model -> Controller: Confirm Verification
+Controller -> RegistrationPopup: Display Verification Confirmation
+
+
+@enduml

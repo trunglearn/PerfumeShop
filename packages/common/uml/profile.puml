@@ -1,0 +1,45 @@
+@startuml
+actor User
+participant UserProfilePopup
+participant Controller
+participant Model
+participant Database
+
+User -> UserProfilePopup: Open User Profile Popup
+activate UserProfilePopup
+UserProfilePopup -> Controller: Request User Profile
+activate Controller
+Controller -> Model: Dispatch Prisma action (findUnique)
+activate Model
+Model -> Database: Query user profile data
+activate Database
+Database --> Model: Return user profile data
+deactivate Database
+Model --> Controller: Return user profile data
+deactivate Model
+Controller --> UserProfilePopup: Return user profile data
+UserProfilePopup --> User: Display user profile data
+deactivate Controller
+
+User -> UserProfilePopup: Submit updated profile or new avatar image
+activate UserProfilePopup
+UserProfilePopup -> Controller: Send updated profile or avatar image (data, file)
+activate Controller
+Controller -> Model: Dispatch Prisma action (update or upload)
+activate Model
+Model -> Database: Update user profile data or Store avatar image
+activate Database
+Database --> Model: Confirm update or upload
+deactivate Database
+Model --> Controller: Return updated profile data or avatar image URL
+deactivate Model
+Controller --> UserProfilePopup: Confirm update or return avatar image URL
+UserProfilePopup --> User: Display success message or new avatar image
+deactivate Controller
+deactivate UserProfilePopup
+
+alt Error Handling
+    UserProfilePopup --> User: Display error message
+end
+
+@enduml

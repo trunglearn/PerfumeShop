@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import * as request from 'common/utils/http-request';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { QueryResponseType } from 'common/types';
 import type { FeedbackType } from 'common/types/feedback';
 import {
-    Button,
-    Form,
-    FormProps,
-    Input,
+    Image as AntImage,
     Pagination,
     Radio,
     RadioChangeEvent,
@@ -18,33 +15,19 @@ import Image from 'next/image';
 import { getImageUrl } from 'common/utils/getImageUrl';
 import moment from 'moment';
 import { PAGE_SIZE, RATING_LIST_CLIENT } from 'common/constant';
-import { SendOutlined } from '@ant-design/icons';
-import { toast } from 'react-toastify';
-import useLoginModal from '~/hooks/useLoginModal';
-import { useAuth } from '~/hooks/useAuth';
+import Avatar from 'common/components/avatar';
 
 type Props = {
     productId: string;
     productRate: number;
 };
 
-type FieldType = {
-    comment?: string;
-};
-
 const Feedback: React.FC<Props> = ({ productId, productRate }) => {
-    const auth = useAuth();
-    const [form] = Form.useForm();
-
-    const { onOpen: openLoginModal } = useLoginModal();
-
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [showCommentForm, setShowCommentForm] = useState<boolean>(false);
+
     const [rateValue, setRateValue] = useState<number | undefined>(undefined);
 
-    const { data, refetch, isFetching } = useQuery<
-        QueryResponseType<FeedbackType>
-    >({
+    const { data, isFetching } = useQuery<QueryResponseType<FeedbackType>>({
         queryKey: [productId, rateValue, currentPage],
         queryFn: () =>
             request
@@ -59,37 +42,15 @@ const Feedback: React.FC<Props> = ({ productId, productRate }) => {
         enabled: !!productId,
     });
 
-    const { mutate: addCommentTrigger } = useMutation({
-        mutationFn: ({ description }: { description: string }) =>
-            request
-                .post('feedback/add', {
-                    productId,
-                    description,
-                })
-                .then((res) => res.data),
-        onSuccess: () => {
-            form.resetFields();
-            toast.success('Bình luận thành công.');
-            refetch();
-        },
-        onError: () => {
-            toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
-        },
-    });
-
     const onChange = (e: RadioChangeEvent) => {
         setRateValue(e.target.value);
-    };
-
-    const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-        addCommentTrigger({ description: values.comment ?? '' });
     };
 
     return (
         <Spin spinning={isFetching}>
             <div className="rounded-lg border p-5">
                 <div className="text-xl uppercase underline underline-offset-4">
-                    Bình luận và đánh giá
+                    Đánh giá
                 </div>
                 <div className="mt-5 grid grid-cols-5 rounded-md border border-rose-50 bg-rose-50 py-8">
                     <div className="flex flex-col items-center gap-4">
@@ -101,6 +62,7 @@ const Feedback: React.FC<Props> = ({ productId, productRate }) => {
                         </div>
                         <div>
                             <Rate
+                                allowHalf
                                 className="text-primary"
                                 defaultValue={productRate}
                                 disabled
@@ -124,60 +86,7 @@ const Feedback: React.FC<Props> = ({ productId, productRate }) => {
                         </Radio.Group>
                     </div>
                 </div>
-                <div className="py-4">
-                    <p className="text-end">
-                        <span
-                            className="cursor-pointer select-none underline underline-offset-2"
-                            onClick={() => {
-                                if (auth) {
-                                    return setShowCommentForm((prev) => !prev);
-                                }
-                                return openLoginModal();
-                            }}
-                            role="presentation"
-                        >
-                            Viết bình luận
-                        </span>
-                    </p>
-                    {showCommentForm && (
-                        <div className="mt-2">
-                            <Form form={form} onFinish={onFinish}>
-                                <Form.Item<FieldType>
-                                    name="comment"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                'Vui lòng nhập bình luận của bạn!',
-                                        },
-                                        {
-                                            max: 400,
-                                            message:
-                                                'Bình luận không được quá 400 ý tự!',
-                                        },
-                                    ]}
-                                >
-                                    <Input.TextArea
-                                        autoSize={{ minRows: 8, maxRows: 8 }}
-                                        placeholder="Nhập bình luận của bạn..."
-                                        rows={6}
-                                    />
-                                </Form.Item>
-                                <div className="flex justify-end">
-                                    <Form.Item>
-                                        <Button
-                                            htmlType="submit"
-                                            icon={<SendOutlined />}
-                                            type="primary"
-                                        >
-                                            Gửi
-                                        </Button>
-                                    </Form.Item>
-                                </div>
-                            </Form>
-                        </div>
-                    )}
-                </div>
+
                 <div className="mt-5">
                     {data?.data && data?.data?.length > 0 ? (
                         <div className="space-y-5">
@@ -185,21 +94,11 @@ const Feedback: React.FC<Props> = ({ productId, productRate }) => {
                                 <div className="border-b pb-5" key={item.id}>
                                     <div className="grid grid-cols-12 gap-5">
                                         <div className="flex justify-end">
-                                            <Image
-                                                alt=""
-                                                className="rounded-full object-cover"
+                                            <Avatar
                                                 height={40}
-                                                src={
-                                                    item?.user?.image
-                                                        ? getImageUrl(
-                                                              item?.user?.image
-                                                          )
-                                                        : '/images/placeholder.jpg'
-                                                }
-                                                style={{
-                                                    width: 40,
-                                                    height: 40,
-                                                }}
+                                                src={getImageUrl(
+                                                    item?.user?.image ?? ''
+                                                )}
                                                 width={40}
                                             />
                                         </div>
@@ -227,8 +126,24 @@ const Feedback: React.FC<Props> = ({ productId, productRate }) => {
                                                     )}
                                                 </p>
                                             )}
-                                            <div className="mt-4">
-                                                {item.description}
+                                            <div className="mt-4 space-y-4">
+                                                <div>{item.description}</div>
+                                                <div className="space-x-4">
+                                                    {item?.image?.map(
+                                                        (image) => (
+                                                            <AntImage
+                                                                className="rounded-lg border object-cover"
+                                                                height={100}
+                                                                key={image.id}
+                                                                src={getImageUrl(
+                                                                    image?.url ??
+                                                                        ''
+                                                                )}
+                                                                width={100}
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

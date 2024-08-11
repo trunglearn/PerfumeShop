@@ -116,8 +116,8 @@ const Search = () => {
                                             )}
                                             width={100}
                                         />
-                                        <div className="col-span-4 space-y-2 py-2">
-                                            <div className="text-lg">
+                                        <div className="col-span-4 space-y-2 py-1">
+                                            <div className="line-clamp-1 text-lg">
                                                 {item?.name}
                                             </div>
                                             <div className="space-x-2">

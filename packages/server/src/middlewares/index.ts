@@ -67,7 +67,36 @@ export const isSeller = async (
         },
     });
 
-    if (!user || user.role !== 'SELLER') {
+    if (!user) {
+        return res.sendStatus(403);
+    }
+
+    if (user.role === 'SELLERMANAGER' || user.role === 'SELLER') {
+        return next();
+    }
+
+    return res.status(403);
+};
+
+export const isSellerManager = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const accessToken = getToken(req);
+    const tokenDecoded = jwtDecode(accessToken) as TokenDecoded;
+
+    if (!accessToken) {
+        return res.sendStatus(401);
+    }
+
+    const user = await db.user.findUnique({
+        where: {
+            id: tokenDecoded.id,
+        },
+    });
+
+    if (!user || user.role !== 'SELLERMANAGER') {
         return res.sendStatus(403);
     }
 

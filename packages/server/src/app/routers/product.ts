@@ -4,6 +4,7 @@ import { isAuthenticated, isMarketer } from '../../middlewares';
 import {
     getLatestProducts,
     getListHotSearchProduct,
+    getListProduct,
     getListProductCart,
     getListProductFeatured,
     getListProductSelect,
@@ -68,4 +69,5 @@ export default (router: Router) => {
     router.get('/product-hot-search', getListHotSearchProduct);
     router.get('/productPublicInfo/:id', getProductPublicInfoById);
     router.get('/list-product-cart', getListProductCart);
+    router.get('/product', getListProduct);
 };

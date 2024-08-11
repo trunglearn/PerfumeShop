@@ -1,0 +1,23 @@
+@startuml
+actor Marketer
+participant "FeedbackDetails" as FeedbackDetailsPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+
+Marketer -> FeedbackDetailsPage: View Feedback Details
+activate FeedbackDetailsPage
+FeedbackDetailsPage -> Controller: getFeedbackDetails(FeedbackId)
+activate Controller
+Controller -> Model: getFeedbackDetails(FeedbackId)
+activate Model
+Model -> Database: db.Feedback.findUnique({id: FeedbackId})
+Database --> Model: Return Feedback details
+Model --> Controller: Return Feedback details
+deactivate Model
+Controller --> FeedbackDetailsPage: Return Feedback details
+FeedbackDetailsPage --> Marketer: Display Feedbacks details
+deactivate Controller
+deactivate FeedbackDetailsPage
+@enduml

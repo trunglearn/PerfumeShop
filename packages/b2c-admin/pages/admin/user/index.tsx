@@ -111,6 +111,10 @@ const filterRole = [
         id: 'SELLER',
         name: 'Seller',
     },
+    {
+        id: 'SELLERMANAGER',
+        name: 'Seller Manager',
+    },
 ];
 
 const filterGender = [

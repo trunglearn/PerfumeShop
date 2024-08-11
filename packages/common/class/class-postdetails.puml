@@ -1,0 +1,43 @@
+@startuml
+
+hide stereotype
+hide circle
+skinparam classAttributeIconSize 0
+
+class Post {
+  +id: String
+  +thumbnail: String
+  +category: String
+  +title: String
+  +briefInfo: String
+  +description: String
+  +featured: Boolean
+  +status: Boolean
+  --
+  +view(): void
+}
+
+class PostDetailsPage {
+  +post: Post
+  --
+  +displayPostDetails(): void
+  +editPostDetails(newInfo): void
+  +changeFeatured(): void
+  +changeStatus(): void
+}
+
+class User {
+  +id: String
+  +name: String
+  +email: String
+  +password: String
+  --
+  +login(email: String, password: String): Boolean
+  +login(email: String, password: String): Boolean
+  +logout(): void
+}
+
+PostDetailsPage -- Post
+User -- Post
+
+@enduml

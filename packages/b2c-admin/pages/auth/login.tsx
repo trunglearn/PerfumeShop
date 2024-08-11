@@ -42,60 +42,60 @@ const Login = () => {
 
     return (
         <div>
-            {mutation.isPending && mutation.isSuccess ? (
-                <Spin
-                    fullscreen
-                    spinning={(mutation as { isPending: boolean }).isPending}
-                />
-            ) : (
-                <div className="flex h-dvh w-dvw flex-col items-center justify-center">
-                    <div className="flex h-[600px] min-w-[400px] items-center justify-center rounded-lg border-2 border-solid border-sky-500 p-4 ">
-                        <Form
-                            className="no-scrollbar w-full overflow-auto"
-                            initialValues={{ remember: true }}
-                            labelCol={{ span: 8 }}
-                            layout="vertical"
-                            onFinish={onFinish}
-                            style={{ maxWidth: 600 }}
-                        >
-                            <Form.Item
-                                label="Email"
-                                name="email"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your username!',
-                                    },
-                                ]}
-                            >
-                                <Input size="large" />
-                            </Form.Item>
-                            <Form.Item
-                                label="Password"
-                                name="password"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your password!',
-                                    },
-                                ]}
-                            >
-                                <Input.Password size="large" />
-                            </Form.Item>
-
-                            <Form.Item>
-                                <Button
-                                    className="bg-[#4096ff]"
-                                    htmlType="submit"
-                                    type="primary"
-                                >
-                                    Submit
-                                </Button>
-                            </Form.Item>
-                        </Form>
+            <Spin
+                fullscreen
+                spinning={(mutation as { isPending: boolean }).isPending}
+            />
+            <div className="flex h-dvh w-dvw flex-col items-center justify-center">
+                <div className="w-[450px] items-center justify-center space-y-10 rounded-lg border p-10 shadow-2xl">
+                    <div className="text-center text-2xl font-semibold uppercase">
+                        Welcome cms
                     </div>
+                    <Form
+                        className="no-scrollbar w-full overflow-auto"
+                        disabled={mutation.isPending}
+                        initialValues={{ remember: true }}
+                        layout="vertical"
+                        onFinish={onFinish}
+                    >
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your username!',
+                                },
+                            ]}
+                        >
+                            <Input size="large" />
+                        </Form.Item>
+                        <Form.Item
+                            label="Password"
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your password!',
+                                },
+                            ]}
+                        >
+                            <Input.Password size="large" />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <Button
+                                className="w-full"
+                                htmlType="submit"
+                                size="large"
+                                type="primary"
+                            >
+                                Submit
+                            </Button>
+                        </Form.Item>
+                    </Form>
                 </div>
-            )}
+            </div>
         </div>
     );
 };

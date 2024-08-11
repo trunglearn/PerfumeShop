@@ -3,16 +3,13 @@ import { Button, Input, Layout, Menu, Spin } from 'antd';
 import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import { get } from 'common/utils/http-request';
+import { POST_CATEGORY } from 'common/constant';
+import { getBlogCategoryName } from 'common/utils/getBlogCategoryName';
 import LatestBlogCard from './LatestBlogCard';
 import styles from '../../styles/Sidebar.module.css';
 
 const { Sider } = Layout;
 const { Search } = Input;
-
-type Category = {
-    id: string;
-    name: string;
-};
 
 type LatestPost = {
     id: string;
@@ -45,15 +42,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     const [expandedCategories, setExpandedCategories] = useState(false);
     const [showAllBlogs, setShowAllBlogs] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<
-        string | undefined
-    >(currentCategory);
-
-    const { data: categories = [], isLoading: categoryLoading } = useQuery<
-        Category[]
-    >({
-        queryKey: ['category'],
-        queryFn: () => get('category').then((res) => res.data.data),
-    });
+        | {
+              id: string;
+              value: string;
+          }
+        | undefined
+    >(POST_CATEGORY.find((cat) => cat.id === currentCategory));
+    const [searchValue, setSearchValue] = useState<string>('');
 
     const { data: latestPosts = [], isLoading: latestPostsLoading } = useQuery<
         LatestPost[]
@@ -65,45 +60,71 @@ const Sidebar: React.FC<SidebarProps> = ({
     const router = useRouter();
 
     useEffect(() => {
-        setSelectedCategory(currentCategory);
+        setSelectedCategory(
+            POST_CATEGORY.find((cat) => cat.id === currentCategory)
+        );
     }, [currentCategory]);
 
-    const handleCategoryChange = (category: string) => {
-        if (selectedCategory === category) {
+    useEffect(() => {
+        if (router.query.search) {
+            setSearchValue(router.query.search as string);
+        }
+    }, [router.query.search]);
+
+    const handleCategoryChange = (category: { id: string; value: string }) => {
+        if (selectedCategory?.id === category.id) {
             if (setCategory) {
                 setCategory('');
             }
-            setSelectedCategory('');
+            setSelectedCategory(undefined);
             if (handleSearch) {
                 handleSearch(1, undefined, undefined, '');
             }
         } else {
             if (setCategory) {
-                setCategory(category);
+                setCategory(category.id);
             }
             setSelectedCategory(category);
             if (isDetailPage) {
                 router.push({
                     pathname: '/blog',
-                    query: { category },
+                    query: { category: category.id },
                 });
             } else if (handleSearch) {
-                handleSearch(1, undefined, undefined, category);
+                handleSearch(1, undefined, undefined, category.id);
             }
         }
     };
 
     const onSearch = (value: string) => {
-        if (handleSearch) {
-            handleSearch(1, undefined, undefined, selectedCategory, value);
+        if (isDetailPage) {
+            router.push({
+                pathname: '/blog',
+                query: { page: 1, pageSize: 12, search: value },
+            });
+        } else if (handleSearch) {
+            handleSearch(
+                1,
+                undefined,
+                undefined,
+                selectedCategory?.id || '',
+                value
+            );
+        }
+    };
+
+    const handleResetFiltersInternal = () => {
+        setSearchValue('');
+        if (handleResetFilters) {
+            handleResetFilters();
         }
     };
 
     const visibleCategories = expandedCategories
-        ? categories
-        : categories.slice(0, 3);
+        ? POST_CATEGORY
+        : POST_CATEGORY.slice(0, 3);
 
-    if (categoryLoading || latestPostsLoading) {
+    if (latestPostsLoading) {
         return <Spin spinning />;
     }
 
@@ -112,8 +133,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.searchSection}>
                 <Search
                     enterButton
+                    onChange={(e) => setSearchValue(e.target.value)}
                     onSearch={onSearch}
                     placeholder="Nhập tên blog để tìm kiếm..."
+                    value={searchValue}
                 />
             </div>
             <div className={styles.menuSection}>
@@ -124,19 +147,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 <Menu
                     mode="inline"
-                    selectedKeys={[selectedCategory || '']}
+                    selectedKeys={[selectedCategory?.id || '']}
                     style={{ borderRight: 0 }}
                 >
                     {visibleCategories.map((category) => (
                         <Menu.Item
                             className={styles.selectedItem}
                             key={category.id}
-                            onClick={() => handleCategoryChange(category.id)}
+                            onClick={() => handleCategoryChange(category)}
                         >
-                            {category.name}
+                            {getBlogCategoryName(category?.value, 'vi')}
                         </Menu.Item>
                     ))}
-                    {categories.length > 3 && (
+                    {POST_CATEGORY.length > 3 && (
                         <Menu.Item className={styles.selectedItem} key="toggle">
                             <Button
                                 className={styles.toggleButton}
@@ -155,7 +178,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <>
                     <Button
                         className={styles.resetButton}
-                        onClick={handleResetFilters}
+                        onClick={handleResetFiltersInternal}
                         type="link"
                     >
                         Xóa bộ lọc
@@ -185,9 +208,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <span className={styles.menuTitleText}>Liên hệ</span>
                 </div>
                 <ul className={styles.contactList}>
-                    <li>Email: blogcontact@example.com</li>
+                    <li>Email: perfumeshop1830@gmail.com</li>
                     <li>Điện thoại: (123) 456-7890</li>
-                    <li>Địa chỉ: 123 Đường Blog, Thành phố Blog, PC 12345</li>
+                    <li>
+                        Địa chỉ: 123 Đường Nước Hoa, Thành phố Hương, PC 12345
+                    </li>
                     <li>
                         <button
                             className={styles.contactDetailButton}

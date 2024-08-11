@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { db } from '../../../lib/db';
 import { PAGE_SIZE } from '../../../constant';
 
@@ -7,7 +8,7 @@ type SortOrder = 'asc' | 'desc';
 export const getListCategoryManage = async (req: Request, res: Response) => {
     const { search, pageSize, currentPage, sortBy, sortOrder } = req.query;
 
-    const prismaQuery = {
+    const prismaQuery: Prisma.CategoryFindManyArgs = {
         skip: (Number(currentPage ?? 1) - 1) * Number(pageSize ?? PAGE_SIZE),
         take: Number(pageSize ?? PAGE_SIZE),
         where: {
@@ -28,9 +29,14 @@ export const getListCategoryManage = async (req: Request, res: Response) => {
 
         const listCategory = await db.category.findMany({
             ...prismaQuery,
-            orderBy: {
-                [String(sortBy)]: sortOrder as SortOrder,
-            },
+            orderBy:
+                sortBy && sortOrder
+                    ? {
+                          [String(sortBy)]: sortOrder as SortOrder,
+                      }
+                    : {
+                          createdAt: 'desc',
+                      },
         });
 
         return res.status(200).json({

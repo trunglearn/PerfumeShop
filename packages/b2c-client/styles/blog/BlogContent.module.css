@@ -8,7 +8,7 @@
     max-width: 1200px;
     width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    
 }
 
 .blogGrid {
@@ -21,4 +21,10 @@
     display: flex;
     justify-content: center;
     margin-bottom: 16px;
+}
+.noBlogsMessage {
+    font-size: 1.5rem;
+    color: #888;
+    margin-top: 30%;
+    text-align: center;
 }

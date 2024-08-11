@@ -1,0 +1,27 @@
+@startuml
+
+actor User
+participant CartContactPage
+participant Controller
+participant Model
+participant Database
+participant CartCompletion
+
+
+
+group CartContact Page Actions
+User -> CartContactPage: Edit Receiver Info
+CartContactPage -> Controller: Update Receiver Info
+Controller -> Model: updateInfo()
+Model -> Database: Fetch User Info
+Database --> Model: Confirm Update
+Model --> Controller: Return Cart Contact
+Controller --> CartContactPage: Return Cart Contact
+
+User -> CartContactPage: Submit Order
+CartContactPage -> Controller: Validate Order
+Controller -> Model: checkQuantity()
+Model -> Database: Fetch Product
+Database --> CartCompletion: Success message
+
+@enduml

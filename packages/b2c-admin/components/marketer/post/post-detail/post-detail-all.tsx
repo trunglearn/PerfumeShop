@@ -45,7 +45,7 @@ const PostDetailAll: React.FC<Props> = ({ data }) => {
             <InfoItem title="Post ID" value={data?.id} />
             <InfoItem title="User" value={data?.user?.name} />
             <InfoItem title="Title" value={data?.title} />
-            <InfoItem title="Category" value={data?.category?.name} />
+            <InfoItem title="Category" value={data?.category} />
             <InfoItem title="Brief Infomation" value={data?.briefInfo} />
             <InfoItem title="Description" value={data?.description} />
             <InfoItem

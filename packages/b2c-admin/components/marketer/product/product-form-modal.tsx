@@ -44,6 +44,7 @@ type FormType = {
     thumbnailList?: UploadFile[];
     productImageList?: UploadFile[];
     isFeatured?: boolean | null;
+    briefInfo?: string | null;
 };
 
 type ProductRequestType = {
@@ -59,6 +60,7 @@ type ProductRequestType = {
     thumbnail: string | null;
     product_image: string[];
     isFeatured?: boolean | null;
+    briefInfo?: string | null;
 };
 
 const ProductFormModal: React.FC<Props> = ({
@@ -155,6 +157,7 @@ const ProductFormModal: React.FC<Props> = ({
                 quantity: productInfo?.data?.quantity,
                 original_price: productInfo?.data?.original_price,
                 discount_price: productInfo?.data?.discount_price,
+                briefInfo: productInfo?.data?.briefInfo,
                 description: productInfo?.data?.description,
                 thumbnailList: productInfo?.data?.thumbnail
                     ? [
@@ -236,6 +239,7 @@ const ProductFormModal: React.FC<Props> = ({
             discount_price,
             description,
             isFeatured,
+            briefInfo,
         } = values;
 
         if (type === 'CREATE') {
@@ -272,6 +276,7 @@ const ProductFormModal: React.FC<Props> = ({
                 isFeatured,
                 thumbnail: thumbnailListResponse?.[0] ?? '',
                 product_image: productImageListRequest ?? [],
+                briefInfo,
             });
         }
 
@@ -313,6 +318,7 @@ const ProductFormModal: React.FC<Props> = ({
                 discount_price,
                 description,
                 isFeatured,
+                briefInfo,
                 thumbnail: newThumbnail?.[0] ?? '',
                 product_image:
                     [...filesUploaded, ...newProductImageRequest] ?? [],
@@ -533,13 +539,26 @@ const ProductFormModal: React.FC<Props> = ({
                                 </Form.Item>
                             </div>
                             <Form.Item<FormType>
+                                label="Brief info"
+                                name="briefInfo"
+                                rules={[
+                                    {
+                                        max: 500,
+                                        message:
+                                            'Brief info must be less than 500 characters!',
+                                    },
+                                ]}
+                            >
+                                <Input.TextArea rows={5} />
+                            </Form.Item>
+                            <Form.Item<FormType>
                                 label="Description"
                                 name="description"
                                 rules={[
                                     {
-                                        max: 1000,
+                                        max: 2000,
                                         message:
-                                            'Description must be less than 100 characters!',
+                                            'Description must be less than 2000 characters!',
                                     },
                                 ]}
                             >

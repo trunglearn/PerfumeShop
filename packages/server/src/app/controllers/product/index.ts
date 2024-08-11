@@ -38,6 +38,7 @@ export const getListProductFeatured = async (req: Request, res: Response) => {
                 description: true,
                 original_price: true,
                 discount_price: true,
+                briefInfo: true,
             },
             orderBy: {
                 updatedAt: 'desc',
@@ -65,19 +66,15 @@ type ProductConditions = {
     isShow?: boolean;
 };
 
-type SortCondition = {
-    [key: string]: 'asc' | 'desc';
-};
-
 export const searchProducts = async (req: Request, res: Response) => {
     const { categoryId, search, sortBy, sortOrder, brandIds } = req.query;
     const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
     const pageSize = req.query.pageSize
         ? parseInt(req.query.pageSize as string, 10)
-        : 4; // Số sản phẩm trên mỗi trang, mặc định là 4
+        : 4;
 
     try {
-        // Xây dựng điều kiện tìm kiếm
+        // Build search conditions
         const conditions: ProductConditions = { isShow: true };
         if (categoryId) {
             conditions.categoryId = String(categoryId);
@@ -94,42 +91,50 @@ export const searchProducts = async (req: Request, res: Response) => {
             conditions.brandId = { in: brandIdsArray };
         }
 
-        // Xây dựng điều kiện sắp xếp
-        const validSortFields = ['discount_price', 'name', 'updatedAt'];
-        const orderBy: SortCondition[] = [];
-        if (sortBy && validSortFields.includes(sortBy as string)) {
-            const sortCondition: SortCondition = {};
-            sortCondition[sortBy as string] =
-                sortOrder === 'desc' ? 'desc' : 'asc';
-            orderBy.push(sortCondition);
-        }
-
-        // Tính toán phân trang
-        const skip = (page - 1) * pageSize;
-
-        // Đếm tổng số sản phẩm thỏa mãn điều kiện tìm kiếm
-        const totalProducts = await db.product.count({
-            where: conditions,
-        });
-
-        // Truy vấn cơ sở dữ liệu với các điều kiện và phân trang
+        // Fetch products without sorting
         const products = await db.product.findMany({
             where: conditions,
-            orderBy: orderBy.length ? orderBy : undefined,
-            skip,
+            skip: (page - 1) * pageSize,
             take: pageSize,
             select: {
                 id: true,
                 name: true,
                 discount_price: true,
                 original_price: true,
+                quantity: true,
                 description: true,
                 thumbnail: true,
                 updatedAt: true,
+                briefInfo: true,
             },
         });
 
-        // Tính tổng số trang
+        // Manual sorting
+        if (sortBy) {
+            if (sortBy === 'discount_price') {
+                products.sort((a, b) => {
+                    const priceA = a.discount_price ?? a.original_price;
+                    const priceB = b.discount_price ?? b.original_price;
+                    return sortOrder === 'desc'
+                        ? priceB - priceA
+                        : priceA - priceB;
+                });
+            } else if (sortBy === 'name' || sortBy === 'updatedAt') {
+                products.sort((a, b) => {
+                    if (sortOrder === 'desc') {
+                        return a[sortBy] < b[sortBy] ? 1 : -1;
+                    }
+                    return a[sortBy] > b[sortBy] ? 1 : -1;
+                });
+            }
+        }
+
+        // Count total products matching search conditions
+        const totalProducts = await db.product.count({
+            where: conditions,
+        });
+
+        // Calculate total pages
         const totalPages = Math.ceil(totalProducts / pageSize);
 
         return res.status(200).json({
@@ -151,6 +156,9 @@ export const getLatestProducts = async (req: Request, res: Response) => {
 
     try {
         const latestProducts = await db.product.findMany({
+            where: {
+                isShow: true,
+            },
             orderBy: {
                 updatedAt: 'desc',
             },
@@ -185,6 +193,7 @@ export const getListHotSearchProduct = async (req: Request, res: Response) => {
                 name: {
                     contains: search ? String(search) : undefined,
                 },
+                isShow: true,
             },
             select: {
                 id: true,
@@ -272,9 +281,10 @@ export const getListProductCart = async (req: Request, res: Response) => {
     const { listProductId } = req.query;
 
     if (!Array.isArray(listProductId) || listProductId.length === 0) {
-        return res
-            .status(400)
-            .json({ message: 'Invalid or empty product ID list' });
+        return res.status(200).json({
+            isOk: true,
+            data: [],
+        });
     }
 
     try {
@@ -284,17 +294,29 @@ export const getListProductCart = async (req: Request, res: Response) => {
                     in: listProductId as string[],
                 },
             },
-            select: {
-                id: true,
-                discount_price: true,
-                original_price: true,
+            include: {
+                category: true,
+                brand: true,
             },
         });
 
         return res.status(200).json({
             isOk: true,
             data: products,
-            message: 'Total price calculated successfully!',
+        });
+    } catch (error) {
+        return res.sendStatus(500);
+    }
+};
+
+export const getListProduct = async (req: Request, res: Response) => {
+    try {
+        const listProduct = await db.product.findMany({});
+
+        return res.status(200).json({
+            isOk: true,
+            data: listProduct,
+            message: 'Get list product successfully!',
         });
     } catch (error) {
         return res.sendStatus(500);

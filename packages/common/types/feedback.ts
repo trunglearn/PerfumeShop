@@ -3,7 +3,7 @@ export type FeedbackType = {
     rating: null | null;
     description: string | null;
     user: User | null;
-    image: FeedbackImage | null;
+    image: FeedbackImage[] | null;
     userId: string | null;
     createdAt: Date | null;
 };

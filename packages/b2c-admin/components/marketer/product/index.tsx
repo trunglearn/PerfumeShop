@@ -236,13 +236,18 @@ const ProductList = () => {
             width: 150,
             align: 'center',
             render: (value: string) => (
-                <Image height={80} src={getImageUrl(value)} width={80} />
+                <Image
+                    className="object-cover"
+                    height={80}
+                    src={getImageUrl(value)}
+                    width={80}
+                />
             ),
         },
         {
             title: 'Brief Info',
-            dataIndex: 'description',
-            key: 'description',
+            dataIndex: 'briefInfo',
+            key: 'briefInfo',
             width: 200,
             render: (value: string) => (
                 <div className="line-clamp-3">{value}</div>
@@ -387,7 +392,12 @@ const ProductList = () => {
                             />
                         </Form.Item>
                         <Form.Item<FormType> label="Search" name="search">
-                            <Input.Search placeholder="Enter product name..." />
+                            <Input
+                                placeholder="Enter product name..."
+                                prefix={
+                                    <SearchOutlined className="text-slate-400" />
+                                }
+                            />
                         </Form.Item>
                         <Form.Item<FormType> label="Rate" name="rating">
                             <Select allowClear placeholder="Select rating...">

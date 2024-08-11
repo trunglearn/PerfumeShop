@@ -1,0 +1,40 @@
+@startuml
+
+actor User
+participant CartDetails
+participant Controller
+participant Model
+participant Database
+
+
+User -> CartDetails: View Cart
+CartDetails -> Controller: Load cart details
+Controller -> Model: getCartDetails()
+Model -> Database: Fetch Cart Details
+Database --> Model: Return Cart Details
+Model --> Controller: Return Cart Details
+Controller --> CartDetails: Return Cart Details List
+
+group Cart Page Actions
+User -> CartDetails: Change Quantity
+
+CartDetails -> Controller: Update Quantity
+Controller -> Model: updateCart()
+Model -> Database: Fetch Updated Cart
+Database --> Model: Return Cart
+Model --> Controller: Return cart details
+Controller --> CartDetails: Return carts list
+
+User -> CartDetails: Delete Product
+
+CartDetails -> Controller:  Remove Product
+Controller -> Model: deletecartproduct()
+Model -> Database: Fetch Delete Cart's product
+Database --> Model: Return Cart
+Model --> Controller: Return cart details
+Controller --> CartDetails: Return carts list
+
+end
+
+
+@enduml

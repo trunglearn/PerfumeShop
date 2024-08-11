@@ -1,0 +1,24 @@
+@startuml
+actor Marketer
+participant "SlidersList" as SlidersListPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+
+
+Marketer -> SlidersListPage: View Sliders Details
+activate SlidersListPage
+SlidersListPage -> Controller: getSlidersDetails(SlidersId)
+activate Controller
+Controller -> Model: getSlidersDetails(SlidersId)
+activate Model
+Model -> Database: db.Sliders.findUnique({id: SlidersId})
+Database --> Model: Return Sliders details
+Model --> Controller: Return Sliders details
+deactivate Model
+Controller --> SlidersListPage: Return Sliders details
+deactivate Controller
+SlidersListPage --> Marketer: Display Sliderss
+deactivate SlidersListPage
+@enduml

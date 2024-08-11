@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { MenuProps } from 'antd';
-import { Dropdown } from 'antd';
-import Image from 'next/image';
+import { Dropdown, Skeleton } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
+import { getImageUrl } from 'common/utils/getImageUrl';
+import { useUserQueryStore } from 'common/store/useUserStore';
+import Avatar from 'common/components/avatar';
+import EditProfilePopup from '../my-page/EditProfilePopup';
+import ChangePasswordPopup from '~/components/my-page/ChangePasswordPopup';
 
 type Props = {
     title: string;
@@ -13,6 +17,10 @@ type Props = {
 const Header: React.FC<Props> = ({ title }) => {
     const router = useRouter();
 
+    const { user, isFetching } = useUserQueryStore();
+    const [isProfilePopupVisible, setIsProfilePopupVisible] = useState(false);
+    const [isChangePasswordPopupVisible, setIsChangePasswordPopupVisible] =
+        useState(false);
     const logOut = () => {
         Cookies.remove('cmsUser');
         setTimeout(() => {
@@ -23,10 +31,28 @@ const Header: React.FC<Props> = ({ title }) => {
     const items: MenuProps['items'] = [
         {
             key: '1',
-            label: <p>Profile</p>,
+            label: (
+                <div
+                    onClick={() => setIsProfilePopupVisible(true)}
+                    role="presentation"
+                >
+                    User Profile
+                </div>
+            ),
         },
         {
             key: '2',
+            label: (
+                <div
+                    onClick={() => setIsChangePasswordPopupVisible(true)}
+                    role="presentation"
+                >
+                    Change Password
+                </div>
+            ),
+        },
+        {
+            key: '3',
             label: (
                 <div
                     className="text-rose-500"
@@ -41,7 +67,13 @@ const Header: React.FC<Props> = ({ title }) => {
 
     return (
         <div className="flex h-[76px] w-full items-center justify-between px-5 shadow-md">
-            <div className="text-2xl font-bold uppercase">{title}</div>
+            <div
+                className="cursor-pointer text-2xl font-bold uppercase"
+                onClick={() => router.push('/')}
+                role="presentation"
+            >
+                {title}
+            </div>
             <div>
                 <Dropdown
                     menu={{ items }}
@@ -50,17 +82,35 @@ const Header: React.FC<Props> = ({ title }) => {
                     }}
                     placement="bottomLeft"
                 >
-                    <div className="flex cursor-pointer space-x-3 rounded-full border px-3 py-1">
-                        <Image
-                            alt="avatar"
-                            className="rounded-full"
-                            height={40}
-                            src="/images/placeholder.jpg"
-                            width={40}
-                        />
+                    <div
+                        className="flex cursor-pointer space-x-3 rounded-full border px-3 py-1.5"
+                        onClick={() => router.push('/my-page')}
+                        role="presentation"
+                    >
+                        {isFetching ? (
+                            <Skeleton.Avatar active className="" />
+                        ) : (
+                            <Avatar
+                                height={40}
+                                src={getImageUrl(user?.data?.image ?? '')}
+                                width={40}
+                            />
+                        )}
                         <MenuOutlined />
                     </div>
                 </Dropdown>
+                {user && (
+                    <EditProfilePopup
+                        onClose={() => setIsProfilePopupVisible(false)}
+                        visible={isProfilePopupVisible}
+                    />
+                )}
+                {user && (
+                    <ChangePasswordPopup
+                        onClose={() => setIsChangePasswordPopupVisible(false)}
+                        visible={isChangePasswordPopupVisible}
+                    />
+                )}
             </div>
         </div>
     );

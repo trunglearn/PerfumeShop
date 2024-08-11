@@ -138,7 +138,7 @@ export const deleteCartProduct = async (req: Request, res: Response) => {
         return res.status(200).json({
             isOk: true,
             data: cart,
-            message: 'Delete cart product successfully!',
+            message: 'Xoá sản phẩm trong giỏ hàng thành công!',
         });
     } catch (error) {
         return res.sendStatus(500);

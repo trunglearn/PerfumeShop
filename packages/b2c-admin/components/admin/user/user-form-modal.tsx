@@ -62,6 +62,7 @@ const UserFormModal: React.FC<Props> = ({ type, title, reload, userId }) => {
         USER: 'User',
         ADMIN: 'Admin',
         SELLER: 'Seller',
+        SELLERMANAGER: 'Seller Manager',
         MARKETER: 'Marketer',
     };
 

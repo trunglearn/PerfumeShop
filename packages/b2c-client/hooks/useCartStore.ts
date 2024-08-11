@@ -78,11 +78,19 @@ const useCartStore = () => {
         toast.success('Sản phẩm đã đc xóa khỏi giỏ hàng.');
     };
 
+    const deleteListProduct = (productIds: string[]) => {
+        const newData = data?.filter(
+            (item) => !productIds.includes(item.productId)
+        );
+        setData(newData);
+    };
+
     return {
         data,
         addProduct,
         updateProductQuantity,
         deleteProduct,
+        deleteListProduct,
     };
 };
 

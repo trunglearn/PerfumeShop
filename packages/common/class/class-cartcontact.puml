@@ -1,0 +1,66 @@
+@startuml
+
+hide stereotype
+hide circle
+skinparam classAttributeIconSize 0
+
+class Cart {
+  +id: String
+  +quantity: Int
+  +userId: String
+  +productId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+  +totalCost: Float
+  --
+  +getTotalCost(): Float
+  +updateQuantity(newQuantity: Int): void
+}
+
+class Product {
+  +id: String
+  +title: String
+  +price: Float
+  +description: String
+  +category: String
+  +image: String
+  --
+  +updatePrice(newPrice: Float): void
+}
+
+class User {
+  +id: String
+  +name: String
+  +email: String
+  +password: String
+  +gender: String
+  +mobile: String
+  +address: String
+  +notes: String
+  --
+  +register(email: String, password: String): void
+  +login(email: String, password: String): Boolean
+}
+
+class CartContactPage {
+  +cartDetails: List<Cart>
+  +totalOrderPrice: Float
+  +receiverFullName: String
+  +receiverGender: String
+  +receiverEmail: String
+  +receiverMobile: String
+  +receiverAddress: String
+  +receiverNotes: String
+  --
+  +displayCartDetails(): void
+  +editReceiverInformation(info): void
+  +submitOrder(): void
+  +handleOrderCompletion(): void
+  +handleOrderError(): void
+}
+
+CartContactPage -- Cart
+Cart -- Product
+Cart -- User
+
+@enduml

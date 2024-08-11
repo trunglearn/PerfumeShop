@@ -15,7 +15,7 @@ interface User {
 // Function to check if user has a specific role
 const hasRole = (user: User, role: Role): boolean => {
     // Implement your logic to check user role based on your authentication system (e.g., JWT claims)
-    return user.role === role;
+    return user.role?.startsWith(role) ?? false;
 };
 
 export default async function middleware(req: NextRequest) {
@@ -66,5 +66,6 @@ export const config = {
         '/admin/:path*',
         '/marketer/:path*',
         '/auth/login',
+        '/my-page/:path*',
     ],
 };

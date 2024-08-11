@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
     if (user) {
         return res.status(400).json({
             ...ERROR_RES,
-            errors: { message: 'Account already exist!' },
+            errors: { message: 'Tài khoản đã tồn tại!' },
         });
     }
 
@@ -45,7 +45,7 @@ export const register = async (req: Request, res: Response) => {
             data: user,
             meta_data: undefined,
         },
-        message: 'Create new account successfully!',
+        message: 'Tạo tài khoản thành công!',
     };
 
     return res.status(200).json(successObj);
@@ -58,7 +58,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const user = await db.user.findUnique({ where: { email: String(email) } });
 
     if (!user) {
-        return res.status(404).json({ message: 'User not found!' });
+        return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
     }
 
     // Tạo token
@@ -130,7 +130,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
                 token_type: updateUserToken.token_type,
             },
         },
-        message: 'Verification email sent successfully!',
+        message: 'Xác thực email thành công!!',
     };
 
     return res.status(200).json(successObj);
@@ -152,7 +152,7 @@ export const checkVerify = async (req: Request, res: Response) => {
 
     if (!user) {
         return res.status(400).json({
-            message: 'Account not found!',
+            message: 'Tài khoản không tồn tại!',
         });
     }
 
@@ -171,7 +171,7 @@ export const checkVerify = async (req: Request, res: Response) => {
                 access_token: token,
             },
         },
-        message: 'Account verify successfully!',
+        message: 'Xác thực tài khoản thành công!',
     };
     return res.status(200).json(successObj);
 };
@@ -181,7 +181,7 @@ export const loginClient = async (req: Request, res: Response) => {
 
     if (!email || !password) {
         return res.status(400).json({
-            message: 'Wrong email or password!',
+            message: 'Email hoặc mật khẩu không chính xác!',
         });
     }
 
@@ -193,13 +193,13 @@ export const loginClient = async (req: Request, res: Response) => {
 
     if (!user) {
         return res.status(400).json({
-            message: 'Account invalid!',
+            message: 'Tài khoản không hợp lệ!',
         });
     }
 
     if (!user.isVerified) {
         return res.status(400).json({
-            message: 'Unverified account!',
+            message: 'Tài khoản chưa được xác thực!',
             data: {
                 id: user.id,
                 email: user.email,
@@ -212,7 +212,13 @@ export const loginClient = async (req: Request, res: Response) => {
 
     if (!isCorrectPassword) {
         return res.status(403).json({
-            message: 'Wrong password!',
+            message: 'Mật khẩu không chính xác!',
+        });
+    }
+
+    if (user.status === 'BANNED') {
+        return res.status(403).json({
+            message: 'Tài khoản đã bị vô hiệu hoá!',
         });
     }
 
@@ -261,7 +267,7 @@ export const loginClient = async (req: Request, res: Response) => {
             refresh_token: updateUserToken.refresh_token,
             token_type: updateUserToken.token_type,
         },
-        message: 'Login successfully!',
+        message: 'Đăng nhập thành công!',
     };
 
     return res.status(200).json(successObj);
@@ -273,7 +279,7 @@ export const senMailResetPassword = async (req: Request, res: Response) => {
     const user = await db.user.findUnique({ where: { email: String(email) } });
 
     if (!user) {
-        return res.status(404).json({ message: 'User not found!' });
+        return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
     }
 
     const token = jwt.sign(
@@ -282,15 +288,15 @@ export const senMailResetPassword = async (req: Request, res: Response) => {
         { expiresIn: 900 } // 15 minutes
     );
 
-    const subject = 'Request to reset password';
-    const title = `Hi ${user.name},`;
+    const subject = 'Yêu cầu đặt lại mật khẩu';
+    const title = `Chào ${user.name},`;
     const mainContent =
-        'You received this email because we received a request to reset your password for your account. Click to button bellow to reset your password.';
+        'Bạn nhận được email này vì chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Nhấn vào nút bên dưới để đặt lại mật khẩu của bạn.';
     const link = `http://localhost:3000/reset-password?token=${token}`;
-    const label = 'Click here to reset password';
-    const secondContent = `If you did not request this verification, you can safely ignore this email. Your account will not be affected.<br>
-        Best regards,<br>
-        Perfume shop.`;
+    const label = 'Nhấn vào đây để đặt lại mật khẩu';
+    const secondContent = `Nếu bạn không yêu cầu xác minh này, bạn có thể bỏ qua email này một cách an toàn. Tài khoản của bạn sẽ không bị ảnh hưởng.<br>
+            Trân trọng,<br>
+            The Perfume.`;
 
     await sendMail({
         to: email,
@@ -302,7 +308,7 @@ export const senMailResetPassword = async (req: Request, res: Response) => {
         link,
     });
 
-    return res.status(200).json({ message: 'Email sent successfully!' });
+    return res.status(200).json({ message: 'Email đã được gửi thành công!' });
 };
 
 export const resetPassword = async (req: Request, res: Response) => {

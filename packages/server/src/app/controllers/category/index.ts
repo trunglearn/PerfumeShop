@@ -20,7 +20,7 @@ export const getListCategory = async (req: Request, res: Response) => {
             },
         });
 
-        return res.status(201).json({
+        return res.status(200).json({
             isOk: true,
             data: listCategory,
             message: 'Get list category successfully!',
@@ -41,7 +41,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
             },
         });
 
-        return res.status(201).json({
+        return res.status(200).json({
             isOk: true,
             data: category,
             message: 'Get category successfully!',

@@ -30,13 +30,17 @@ const BlogContent: React.FC<BlogContentProps> = ({
     return (
         <Layout className={styles.layout}>
             <Content className={styles.content}>
-                <div className={styles.blogGrid}>
-                    {blogs.map((blog) => (
-                        <div className={styles.gridItem} key={blog.id}>
-                            <BlogCard {...blog} />
-                        </div>
-                    ))}
-                </div>
+                {blogs.length === 0 ? (
+                    <div className={styles.noBlogsMessage}>Không có Blog</div>
+                ) : (
+                    <div className={styles.blogGrid}>
+                        {blogs.map((blog) => (
+                            <div className={styles.gridItem} key={blog.id}>
+                                <BlogCard {...blog} />
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div className="mt-5 flex justify-end">
                     {total > 0 && (
                         <Pagination

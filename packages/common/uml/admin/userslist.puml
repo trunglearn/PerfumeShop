@@ -1,0 +1,24 @@
+@startuml
+actor User
+participant "UsersList" as UsersListPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+
+
+User -> UsersListPage: View Users Details
+activate UsersListPage
+UsersListPage -> Controller: getUsersDetails(UsersId)
+activate Controller
+Controller -> Model: getUsersDetails(UsersId)
+activate Model
+Model -> Database: db.Users.findUnique({id: UsersId})
+Database --> Model: Return Users details
+Model --> Controller: Return Users details
+deactivate Model
+Controller --> UsersListPage: Return Users details
+deactivate Controller
+UsersListPage --> User: Display Userss
+deactivate UsersListPage
+@enduml

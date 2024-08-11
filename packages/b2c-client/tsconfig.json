@@ -27,6 +27,6 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "../common/types/cart.ts"
-    ],
+, "../common/store/useUserStore.ts"    ],
     "exclude": ["node_modules"]
 }

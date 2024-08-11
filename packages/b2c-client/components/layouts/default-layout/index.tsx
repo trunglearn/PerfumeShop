@@ -14,7 +14,7 @@ export const DefaultLayout: React.FC<Props> = ({ children }) => {
                 <Header />
                 <MainSider />
             </div>
-            <div>{children}</div>
+            <div className="min-h-[70vh]">{children}</div>
             <div className="mt-10">
                 <Footer />
             </div>

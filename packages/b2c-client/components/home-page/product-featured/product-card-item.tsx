@@ -31,7 +31,7 @@ const ProductCardItem: React.FC<Props> = ({ data }) => {
                     {data?.name}
                 </div>
                 <div className="line-clamp-2 flex-1 text-lg text-slate-500">
-                    {data?.description}
+                    {data?.briefInfo}
                 </div>
                 <div className="text-primary space-x-4 text-end text-xl">
                     {data?.original_price && (

@@ -5,3 +5,5 @@ export type TokenDecoded = {
     iat: number;
     exp: number;
 };
+
+export type SortOrder = 'desc' | 'asc';

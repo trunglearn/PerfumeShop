@@ -31,3 +31,10 @@
     justify-content: center;
     margin-top: 20px;
 }
+
+.noProductsMessage {
+    font-size: 1.5rem;
+    color: #888;
+    margin-top: 30%;
+    text-align: center;
+}

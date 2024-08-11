@@ -1,0 +1,28 @@
+@startuml
+actor User
+participant "CartCompletionPage" as CartPage
+participant "Controller" as OrderCtrl
+participant "Model" as Model
+participant "EmailService" as EmailService
+participant "SystemConfiguration" as SysConfig
+
+User -> CartPage: View Cart Completion
+CartPage -> OrderCtrl: submitOrder(orderDetails)
+OrderCtrl -> Model: updateProductQuantities(orderDetails)
+Model -> Database: db.products.updateQuantities(orderDetails)
+Database --> Model: Quantities Updated
+
+OrderCtrl -> Model: assignOrderToSaler(orderDetails)
+Model -> Database: db.salers.assignOrder(orderDetails)
+Database --> Model: Order Assigned to Saler
+Model --> OrderCtrl: Order Assigned to Saler
+
+
+OrderCtrl -> EmailService: sendOrderConfirmationEmail(receiverInfo)
+EmailService -> SysConfig: getPaymentInformation()
+SysConfig --> EmailService: Payment Information
+EmailService -> User: sendEmail(orderConfirmation, paymentInfo)
+
+OrderCtrl --> CartPage: displayOrderConfirmation(orderConfirmation, paymentInfo)
+CartPage --> User: Display Order Confirmation and Payment Info
+@enduml

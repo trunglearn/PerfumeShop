@@ -1,0 +1,49 @@
+@startuml
+
+hide stereotype
+hide circle
+skinparam classAttributeIconSize 0
+
+class Post {
+  +id: String
+  +thumbnail: String
+  +title: String
+  +category: String
+  +author: String
+  +featured: Boolean
+  +status: Boolean
+  +content: String
+}
+
+class PostsListPage {
+  +posts: List<Post>
+  +currentPage: Int
+  +totalPages: Int
+  --
+  +displayPosts(): void
+  +filterPosts(filterType: String, filterValue: String): List<Post>
+  +searchPosts(query: String): List<Post>
+  +sortPosts(sortBy: String): List<Post>
+  +addPost(post: Post): void
+  +editPost(postId: String, newContent: String): void
+  +deletePost(postId: String): void
+  +viewPost(postId: String): Post
+  +hidePost(postId: String): void
+  +showPost(postId: String): void
+}
+
+class User {
+  +id: String
+  +name: String
+  +email: String
+  +password: String
+  --
+  +login(email: String, password: String): Boolean
+  +login(email: String, password: String): Boolean
+  +logout(): void
+}
+
+PostsListPage -- Post
+User -- Post
+
+@enduml

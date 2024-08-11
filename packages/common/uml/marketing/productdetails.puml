@@ -1,0 +1,23 @@
+@startuml
+actor Marketer
+participant "ProductDetails" as ProductDetailsPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+
+Marketer -> ProductDetailsPage: View Product Details
+activate ProductDetailsPage
+ProductDetailsPage -> Controller: getProductDetails(ProductId)
+activate Controller
+Controller -> Model: getProductDetails(ProductId)
+activate Model
+Model -> Database: db.Product.findUnique({id: ProductId})
+Database --> Model: Return Product details
+Model --> Controller: Return Product details
+deactivate Model
+Controller --> ProductDetailsPage: Return Product details
+deactivate Controller
+ProductDetailsPage --> Marketer: Display Products
+deactivate ProductDetailsPage
+@enduml

@@ -1,18 +1,32 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import * as request from 'common/utils/http-request';
-import { Button, Space, Spin, Table, TableColumnsType, TableProps } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import {
+    Button,
+    Form,
+    FormProps,
+    Input,
+    Space,
+    Spin,
+    Table,
+    TableColumnsType,
+    TableProps,
+} from 'antd';
 import moment from 'moment';
 import { getSortOrder } from 'common/utils/getSortOrder';
+import { SearchOutlined } from '@ant-design/icons';
 import { Category } from '~/types/product';
 import { Pagination, QueryResponseType, Sorts } from '~/types';
+import CategoryFormModal from './category-form-modal';
+import DeleteCategoryAlert from './delete-category-alert';
 
 type FormType = {
     search?: string;
 };
 
 const ListCategory = () => {
+    const [searchParams, setSearchParams] = useState<FormType>();
+
     const [paginationQuery, setPaginationQuery] = useState<Partial<Pagination>>(
         {
             current: 1,
@@ -22,7 +36,12 @@ const ListCategory = () => {
     const [sortedInfo, setSortedInfo] = useState<Sorts<FormType>>({});
 
     const { data, isLoading, refetch } = useQuery<QueryResponseType<Category>>({
-        queryKey: ['list-category-manage'],
+        queryKey: [
+            'list-category-manage',
+            paginationQuery,
+            sortedInfo,
+            searchParams,
+        ],
         queryFn: () =>
             request
                 .get('manage/category', {
@@ -31,6 +50,7 @@ const ListCategory = () => {
                         currentPage: paginationQuery.current,
                         sortBy: sortedInfo.field,
                         sortOrder: getSortOrder(sortedInfo.order),
+                        ...searchParams,
                     },
                 })
                 .then((res) => res.data),
@@ -58,17 +78,29 @@ const ListCategory = () => {
             sortOrder:
                 sortedInfo.columnKey === 'createdAt' ? sortedInfo.order : null,
             render: (value: Date) => (
-                <p>{value ? moment(value).format('DD-MMM-YYYY') : ''}</p>
+                <p>{value ? moment(value).format('YYYY-MM-DD') : ''}</p>
             ),
         },
         {
             title: 'Actions',
             key: 'actions',
             width: 150,
-            render: () => (
+            render: (_, record) => (
                 <Space>
-                    <Button icon={<EditOutlined />} type="link" />
-                    <Button danger icon={<DeleteOutlined />} type="link" />
+                    <CategoryFormModal
+                        categoryId={record.id ?? undefined}
+                        reloadList={() => {
+                            refetch();
+                        }}
+                        type="UPDATE"
+                    />
+                    <DeleteCategoryAlert
+                        categoryId={record?.id ?? ''}
+                        name={record?.name ?? ''}
+                        reloadList={() => {
+                            refetch();
+                        }}
+                    />
                 </Space>
             ),
         },
@@ -84,14 +116,43 @@ const ListCategory = () => {
             pageSize: pagination.pageSize,
         });
         setSortedInfo(sorter as Sorts<FormType>);
-        setTimeout(() => {
-            refetch();
-        }, 500);
+    };
+
+    const onFinish: FormProps<FormType>['onFinish'] = (values) => {
+        setSearchParams(values);
     };
 
     return (
         <Spin spinning={isLoading}>
-            <div>
+            <div className="space-y-4">
+                <div className="flex justify-end">
+                    <Form layout="inline" onFinish={onFinish}>
+                        <Form.Item<FormType> label="Search" name="search">
+                            <Input
+                                className="w-[400px]"
+                                placeholder="Enter category name..."
+                                prefix={
+                                    <SearchOutlined className="text-slate-400" />
+                                }
+                            />
+                        </Form.Item>
+                        <Button
+                            htmlType="submit"
+                            icon={<SearchOutlined />}
+                            type="primary"
+                        >
+                            Search
+                        </Button>
+                    </Form>
+                </div>
+                <div className="flex justify-end">
+                    <CategoryFormModal
+                        reloadList={() => {
+                            refetch();
+                        }}
+                        type="CREATE"
+                    />
+                </div>
                 <Table
                     columns={columns}
                     dataSource={data?.data}

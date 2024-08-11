@@ -24,13 +24,19 @@ const ProductContent: React.FC<ProductContentProps> = ({
     return (
         <Layout className={styles.layout}>
             <Content className={styles.content}>
-                <div className={styles.productGrid}>
-                    {products.map((product) => (
-                        <div className={styles.gridItem} key={product.id}>
-                            <ProductCard {...product} />
-                        </div>
-                    ))}
-                </div>
+                {products.length === 0 ? (
+                    <div className={styles.noProductsMessage}>
+                        Không có sản phẩm
+                    </div>
+                ) : (
+                    <div className={styles.productGrid}>
+                        {products.map((product) => (
+                            <div className={styles.gridItem} key={product.id}>
+                                <ProductCard {...product} />
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div className="mt-5 flex justify-end">
                     {total > 0 && (
                         <Pagination

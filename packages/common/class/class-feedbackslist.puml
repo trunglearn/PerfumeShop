@@ -1,0 +1,45 @@
+@startuml
+
+hide stereotype
+hide circle
+skinparam classAttributeIconSize 0
+
+class Feedback {
+  +id: String
+  +fullName: String
+  +productName: String
+  +ratedStar: Int
+  +status: String
+  +content: String
+  --
+  +view(): void
+  +changeStatus(newStatus: String): void
+}
+
+class FeedbacksListPage {
+  +feedbacks: List<Feedback>
+  +currentPage: Int
+  +totalPages: Int
+  --
+  +displayFeedbacks(): void
+  +filterFeedbacks(filterType: String, filterValue: String): List<Feedback>
+  +searchFeedbacks(query: String): List<Feedback>
+  +sortFeedbacks(sortBy: String): List<Feedback>
+}
+
+class User {
+  +id: String
+  +name: String
+  +email: String
+  +password: String
+  --
+  +login(email: String, password: String): Boolean
+  +login(email: String, password: String): Boolean
+  +logout(): void
+}
+
+
+FeedbacksListPage -- Feedback 
+User -- Feedback 
+
+@enduml

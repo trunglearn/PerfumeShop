@@ -85,6 +85,7 @@ export const getListProductManage = async (req: Request, res: Response) => {
             thumbnail: true,
             description: true,
             isFeatured: true,
+            briefInfo: true,
         };
 
         const total = await db.product.count({
@@ -140,6 +141,7 @@ export const createProduct = async (req: Request, res: Response) => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         product_image,
         isFeatured,
+        briefInfo,
     } = req.body;
 
     try {
@@ -156,6 +158,7 @@ export const createProduct = async (req: Request, res: Response) => {
                 thumbnail,
                 isShow,
                 isFeatured,
+                briefInfo,
                 product_image: {
                     createMany: {
                         data: product_image,
@@ -189,6 +192,7 @@ export const updateProduct = async (req: Request, res: Response) => {
         categoryId,
         thumbnail,
         isShow,
+        briefInfo,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         product_image,
         isFeatured,
@@ -217,6 +221,7 @@ export const updateProduct = async (req: Request, res: Response) => {
                 thumbnail,
                 isShow,
                 isFeatured,
+                briefInfo,
                 product_image: {
                     createMany: {
                         data: product_image,

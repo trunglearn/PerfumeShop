@@ -1,0 +1,24 @@
+@startuml
+actor Marketer
+participant "PostList" as PostListPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+Marketer -> PostListPage: Access Post List
+activate PostListPage
+
+PostListPage -> Controller: Load Post list
+activate Controller
+Controller -> Model: getListPostManage()
+activate Model
+Model -> Database: db.post.findMany({latest})
+Database --> Model: Return latest posts
+Model --> Controller: Return latest posts
+deactivate Model
+Controller --> PostListPage: Return posts
+deactivate Controller
+PostListPage --> Marketer: Display posts
+deactivate PostListPage
+
+@enduml

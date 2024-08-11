@@ -1,8 +1,7 @@
 import React from 'react';
-import { Card } from 'antd';
 import { useRouter } from 'next/router';
 import { getImageUrl } from '~/../common/utils/getImageUrl';
-import styles from '../../styles/blog/BlogCard.module.css';
+import Image from 'next/image';
 
 type Blog = {
     id: string;
@@ -19,16 +18,30 @@ const BlogCard: React.FC<Blog> = ({ id, title, briefInfo, thumbnail }) => {
     };
     const imageUrl = thumbnail ? getImageUrl(thumbnail) : '/images/sp1.jpg';
     return (
-        <Card
-            className={styles.blogCard}
-            cover={
-                <img alt={title} className={styles.blogImage} src={imageUrl} />
-            }
-            hoverable
+        <div
+            className="w-[300px] cursor-pointer rounded-lg border hover:shadow-md"
             onClick={handleCardClick}
+            role="presentation"
         >
-            <Card.Meta description={briefInfo} title={title} />
-        </Card>
+            <div>
+                <Image
+                    alt={title}
+                    className="rounded-t-lg"
+                    height={200}
+                    src={imageUrl}
+                    style={{
+                        height: 200,
+                        width: 300,
+                        objectFit: 'cover',
+                    }}
+                    width={300}
+                />
+            </div>
+            <div className="space-y-4 p-4">
+                <div className="text-xl font-semibold">{title}</div>
+                <div className="line-clamp-4">{briefInfo}</div>
+            </div>
+        </div>
     );
 };
 

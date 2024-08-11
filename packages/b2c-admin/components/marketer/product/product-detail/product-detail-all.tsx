@@ -60,16 +60,20 @@ const InfoItem: React.FC<InfoItemProps> = ({
     }, [value, render, listImage]);
 
     return (
-        <div className="grid grid-cols-8 space-x-10 border-b py-4">
-            <div className="col-span-2 text-end text-lg font-bold">{title}</div>
-            <div className="col-span-6">{renderValue}</div>
+        <div className="grid grid-cols-8 space-x-10 border-b">
+            <div className="col-span-2 flex items-center justify-center bg-slate-200 py-4 text-center text-lg font-semibold">
+                {title}
+            </div>
+            <div className="col-span-6 flex items-center py-4">
+                {renderValue}
+            </div>
         </div>
     );
 };
 
 const ProductDetailAll: React.FC<Props> = ({ data }) => {
     return (
-        <div>
+        <div className="border-t-2 border-t-black">
             <InfoItem title="Product ID" value={data?.id} />
             <InfoItem title="Name" value={data?.name} />
             <InfoItem title="Brand" value={data?.brand?.name} />

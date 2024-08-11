@@ -32,9 +32,11 @@ model User {
 
   accounts Account[]
   feedback Feedback[]
+  comment Comment[]
   cart     Cart[]
-  order    Order[]
+  order    Order[] @relation("customer")
   post     Post[]
+  assignedOrders Order[] @relation("orderAssigned")
 }
 
 model Account {
@@ -53,6 +55,7 @@ enum Role {
   ADMIN
   SELLER
   MARKETER
+  SELLERMANAGER
 }
 
 enum UserStatus {
@@ -76,11 +79,13 @@ model Product {
   discount_price Int?
   quantity       Int     @default(0)
   sold_quantity  Int     @default(0)
+  briefInfo      String? @db.Text
   description    String? @db.Text
   size           Int?
   categoryId     String
   thumbnail      String? @db.Text
   rating         Float   @default(0)
+  totalRate      Int?
   isShow         Boolean @default(true)
   isFeatured     Boolean @default(false)
 
@@ -93,6 +98,7 @@ model Product {
   product_image ProductImage[]
 
   feedback Feedback[]
+  comment Comment[]
   cart     Cart[]
 
   @@index([brandId, categoryId])
@@ -114,9 +120,12 @@ model Category {
   updatedAt DateTime @updatedAt
 
   product Product[]
-  post    Post[]
+  
 }
-
+enum PostCategory {
+ NEWS
+ REVIEW
+}
 model ProductImage {
   id        String @id @default(uuid())
   url       String @db.Text
@@ -153,16 +162,14 @@ model Post {
   thumbnail   String? @db.Text
   isShow      Boolean @default(true)
   userId      String
-  categoryId  String
+  
   isFeatured  Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  category PostCategory 
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@index([categoryId])
 }
 
 enum SLIDER_STATUS {
@@ -175,7 +182,8 @@ model Feedback {
   description String? @db.Text
   userId      String
   productId   String
-  rating      Int?
+  rating      Float? 
+  isShow      Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -184,6 +192,24 @@ model Feedback {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   image FeedbackImage[]
+
+  @@index([userId, productId])
+  OrderDetail OrderDetail[]
+}
+
+model Comment {
+  id          String  @id @default(uuid())
+  description String? @db.Text
+  userId      String
+  productId   String 
+  isShow      Boolean @default(true)  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
 
   @@index([userId, productId])
 }
@@ -216,12 +242,15 @@ model Cart {
 model Order {
   id            String       @id @default(uuid())
 
-  userId        String
+  appTransId       String? @unique
+
+  userId        String?
   address       String
   name          String
   gender        Gender
   email         String
-  phoneNumber   String
+  phone         String
+  saleNote      String? @db.Text
   
   status        ORDER_STATUS @default(PENDING)
   totalAmount   Int
@@ -231,10 +260,14 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?          @relation("customer",fields: [userId], references: [id], onDelete: Cascade)  
+  sellerId String?
+  seller        User?        @relation("orderAssigned", fields: [sellerId], references: [id], onDelete: Cascade)
+  
   orderDetail OrderDetail[]
 
   @@index([userId])
+  @@index([sellerId])
 }
 
 enum PAYMENT_TYPE {
@@ -243,6 +276,8 @@ enum PAYMENT_TYPE {
 }
 
 enum ORDER_STATUS {
+  PAYMENT_PENDING
+  PAID
   PENDING
   CONFIRMED
   DELIVERING
@@ -269,5 +304,30 @@ model OrderDetail {
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  feedbackId String?
+  feedback Feedback? @relation(fields: [feedbackId], references: [id])
+
   @@index([orderId])
 }
+
+model AuditLog {
+  id          String  @id @default(uuid())  
+  action      ACTION
+  orderId   String  
+  title String
+  userId      String
+  userImage   String @db.Text
+  userName    String @db.Text
+  userEmail   String @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum ACTION {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+

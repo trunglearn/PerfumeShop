@@ -15,18 +15,6 @@ const items: MenuItem[] = [
         key: 'user',
         label: <Link href="/admin/user">User</Link>,
     },
-    {
-        key: 'revenue',
-        label: <Link href="/marketer/slider">Revenue</Link>,
-    },
-    {
-        key: 'order',
-        label: <Link href="/marketer/customer">Order</Link>,
-    },
-    {
-        key: 'feedback',
-        label: <Link href="/marketer/feedback">Feedback</Link>,
-    },
 ];
 
 const AdminSidebar = () => {

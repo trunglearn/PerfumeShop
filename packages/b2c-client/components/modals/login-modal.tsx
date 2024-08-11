@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import { Alert, Button, Form, Input } from 'antd';
+import { Alert, Button, Form, Input, Spin, Typography } from 'antd';
 import { AxiosError, AxiosResponse } from 'axios';
 import Modal from 'common/components/modal';
 import request from 'common/utils/http-request';
-import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useLoginModal from '~/hooks/useLoginModal';
 import useRegisterModal from '~/hooks/useRegisterModal';
 import ForgotPasswordModal from './forgot-password-modal';
@@ -19,10 +19,27 @@ const LoginModal = () => {
     const [loading, setLoading] = useState(false);
     const [emailUser, setEmailUser] = useState('');
     const [isVerified, setIsVerified] = useState<boolean>(true);
+    const [secondsToGo, setSecondsToGo] = useState(0);
+    const { Paragraph, Text } = Typography;
+
     const toggle = useCallback(() => {
         onClose();
         onOpen();
     }, [onClose, onOpen]);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            if (secondsToGo > 0) {
+                setSecondsToGo(secondsToGo - 1);
+            }
+            if (secondsToGo === 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+        return () => {
+            clearInterval(timer);
+        };
+    });
 
     const { mutate: loginUser, isPending: loginUserIsPending } = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
@@ -59,22 +76,27 @@ const LoginModal = () => {
         },
     });
 
-    const { mutate: verifyEmail } = useMutation({
-        mutationFn: async (email: string) => {
-            return request.post(`/auth/verify-email/${email}`);
-        },
-        onSuccess: (res) => {
-            toast.success(res.data.message);
-        },
-        onError: (error: AxiosError<AxiosResponse<{ message: string }>>) => {
-            toast.error(
-                (error.response?.data as unknown as { message: string }).message
-            );
-        },
-    });
+    const { mutate: verifyEmail, isPending: isPendingVerifyEmail } =
+        useMutation({
+            mutationFn: async (email: string) => {
+                return request.post(`/auth/verify-email/${email}`);
+            },
+            onSuccess: (res) => {
+                toast.success(res.data.message);
+            },
+            onError: (
+                error: AxiosError<AxiosResponse<{ message: string }>>
+            ) => {
+                toast.error(
+                    (error.response?.data as unknown as { message: string })
+                        .message
+                );
+            },
+        });
 
     const sendMail = () => {
         verifyEmail(emailUser);
+        setSecondsToGo(60);
     };
 
     const onFinish = (values: { email: string; password: string }) => {
@@ -100,7 +122,7 @@ const LoginModal = () => {
             </div>
             <Form
                 className="no-scrollbar overflow-auto"
-                disabled={loading}
+                disabled={loading || isPendingVerifyEmail}
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -111,19 +133,19 @@ const LoginModal = () => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your username!',
+                            message: 'Hãy nhập email của bạn',
                         },
                     ]}
                 >
                     <Input size="large" />
                 </Form.Item>
                 <Form.Item
-                    label="Password"
+                    label="Mật khẩu"
                     name="password"
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your password!',
+                            message: 'Hãy nhập mật khẩu của bạn',
                         },
                     ]}
                 >
@@ -134,31 +156,47 @@ const LoginModal = () => {
                     <Button htmlType="submit" />
                 </Form.Item>
             </Form>
-            {isVerified === false && (
+
+            {isVerified === false && secondsToGo === 0 && (
                 <Alert
                     description={
                         <>
                             <span>
                                 <button
                                     className="focus:shadow-outline rounded font-bold text-blue-500 hover:text-blue-700 focus:outline-none"
+                                    disabled={secondsToGo > 0}
                                     onClick={sendMail}
                                     type="button"
                                 >
-                                    Click here
+                                    Ấn vào đây
                                 </button>
                             </span>
                             <span className="mx-2">
-                                to verify your account. If you have not received
-                                the verification email, we will send a new one
-                                to {emailUser}. Please check your email and
-                                follow the instructions to activate your
-                                account.
+                                để xác nhận tài khoản của bạn. Chúng tôi sẽ gửi
+                                email xác thực tới {emailUser}. Hãy kiểm tra
+                                email của bạn và làm theo hướng dẫn để xác thực
+                                tài khoản.
                             </span>
                         </>
                     }
-                    message="Your account has not been verified."
+                    message="Tài khoản của bạn chưa được xác thực."
                     type="info"
                 />
+            )}
+
+            {secondsToGo > 0 && (
+                <Paragraph className="flex space-x-2 ">
+                    <Spin />
+                    <div className="flex space-x-1">
+                        <span>Gửi email xác thực sau</span>
+                        <Text type="danger">
+                            {Math.floor(secondsToGo / 60)}
+                        </Text>{' '}
+                        <span>phút</span>
+                        <Text type="danger">{secondsToGo % 60}</Text>{' '}
+                        <span>giây</span>
+                    </div>
+                </Paragraph>
             )}
         </div>
     );

@@ -1,4 +1,5 @@
 import { TableProps } from 'antd';
+import { AxiosError } from 'axios';
 
 type PaginationResponse = {
     total?: number;
@@ -27,3 +28,8 @@ export type QueryResponseGetOneType<T> = {
     data?: T;
     message?: string | null;
 };
+
+export type QueryErrorType = AxiosError<{
+    isOk?: boolean | null;
+    message?: string | null;
+}>;

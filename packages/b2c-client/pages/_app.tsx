@@ -12,7 +12,7 @@ import type { NextPage } from 'next';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Spin } from 'common/components/spin';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 import Head from 'next/head';
 import { ConfigProvider } from 'antd';
 import { getImageUrl } from 'common/utils/getImageUrl';
@@ -94,6 +94,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                         colorPrimary: '#F43F5E',
                         algorithm: true,
                     },
+                    Tabs: {
+                        colorPrimary: '#F43F5E',
+                        algorithm: true,
+                    },
                 },
                 token: {
                     fontSize: 12,
@@ -113,7 +117,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                         type="image/png"
                     />
                 </Head>
-                <ToastContainer autoClose={1000} />
+                <ToastContainer autoClose={1500} stacked transition={Zoom} />
                 <LoginModal />
                 <RegisterModal />
                 {getLayout(<Component {...pageProps} />)}

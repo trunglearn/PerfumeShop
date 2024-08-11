@@ -3,6 +3,7 @@ import { Layout, Spin } from 'antd';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { get } from 'common/utils/http-request';
+import { PAGE_SIZE_CLIENT_BLOG } from 'common/constant';
 import Sidebar from '../../components/blog/Sidebar';
 import HeaderBar from '../../components/blog/HeaderBar';
 import BlogContent from '../../components/blog/BlogContent';
@@ -70,7 +71,7 @@ const ListBlogPage: NextPage = () => {
     useEffect(() => {
         const params: SearchParams = {
             page: Number(routerQuery.page) || 1,
-            pageSize: Number(routerQuery.pageSize) || 10,
+            pageSize: Number(routerQuery.pageSize) || PAGE_SIZE_CLIENT_BLOG,
             sortBy: (routerQuery.sort as string) || 'updatedAt',
             sortOrder: (routerQuery.sortOrder as string) || 'desc',
             categoryId: routerQuery.category as string,
@@ -89,7 +90,9 @@ const ListBlogPage: NextPage = () => {
     ) => {
         const params: SearchParams = {
             page,
-            pageSize: pageSizeParam ?? (Number(routerQuery.pageSize) || 10),
+            pageSize:
+                pageSizeParam ??
+                (Number(routerQuery.pageSize) || PAGE_SIZE_CLIENT_BLOG),
             sortBy: sortParam ?? (routerQuery.sort as string),
             sortOrder: sortOrderParam ?? (routerQuery.sortOrder as string),
             categoryId: categoryParam ?? (routerQuery.category as string),
@@ -102,7 +105,7 @@ const ListBlogPage: NextPage = () => {
     const handleResetFilters = () => {
         const params: SearchParams = {
             page: 1,
-            pageSize: 10,
+            pageSize: PAGE_SIZE_CLIENT_BLOG,
         };
 
         updateUrlAndFetchBlogs(params);
@@ -149,25 +152,30 @@ const ListBlogPage: NextPage = () => {
                             );
                         }}
                     />
-                    <h1 className={styles.blogTitle}>Danh sách blog</h1>
-                    <Content className={styles.content}>
-                        <BlogContent
-                            blogs={blogs}
-                            currentPage={Number(routerQuery.page) || 1}
-                            onPageChange={(page, newPageSize) =>
-                                handleSearch(
-                                    page,
-                                    routerQuery.sort as string,
-                                    routerQuery.sortOrder as string,
-                                    routerQuery.category as string,
-                                    routerQuery.search as string,
-                                    newPageSize
-                                )
-                            }
-                            pageSize={Number(routerQuery.pageSize) || 10}
-                            total={totalBlogs}
-                        />
-                    </Content>
+                    <div className="rounded-lg border px-10">
+                        <h1 className={styles.blogTitle}>Danh sách blog</h1>
+                        <Content className={styles.content}>
+                            <BlogContent
+                                blogs={blogs}
+                                currentPage={Number(routerQuery.page) || 1}
+                                onPageChange={(page, newPageSize) =>
+                                    handleSearch(
+                                        page,
+                                        routerQuery.sort as string,
+                                        routerQuery.sortOrder as string,
+                                        routerQuery.category as string,
+                                        routerQuery.search as string,
+                                        newPageSize
+                                    )
+                                }
+                                pageSize={
+                                    Number(routerQuery.pageSize) ||
+                                    PAGE_SIZE_CLIENT_BLOG
+                                }
+                                total={totalBlogs}
+                            />
+                        </Content>
+                    </div>
                 </Layout>
             </Layout>
         </Spin>

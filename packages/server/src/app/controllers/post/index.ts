@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { PostCategory } from '@prisma/client';
 import { db } from '../../../lib/db';
 import { TAKE_LATEST_CLIENT_DEFAULT } from '../../../constant';
 
@@ -16,11 +17,7 @@ export const getListPost = async (req: Request, res: Response) => {
                 id: true,
                 title: true,
                 description: true,
-                category: {
-                    select: {
-                        name: true,
-                    },
-                },
+                category: true,
                 thumbnail: true,
                 isShow: true,
             },
@@ -50,11 +47,6 @@ export const getPostById = async (req: Request, res: Response) => {
             },
             include: {
                 user: {
-                    select: {
-                        name: true,
-                    },
-                },
-                category: {
                     select: {
                         name: true,
                     },
@@ -128,8 +120,10 @@ export const getListFeaturedPost = async (req: Request, res: Response) => {
     }
 };
 
+type PostCategoryType = 'NEWS' | 'REVIEW';
+
 type PostConditions = {
-    categoryId?: string;
+    category?: PostCategoryType;
     title?: {
         contains: string;
     };
@@ -151,7 +145,7 @@ export const searchPosts = async (req: Request, res: Response) => {
         // Xây dựng điều kiện tìm kiếm
         const conditions: PostConditions = { isShow: true };
         if (categoryId) {
-            conditions.categoryId = String(categoryId);
+            conditions.category = categoryId as PostCategory;
         }
         if (search) {
             conditions.title = {
@@ -230,11 +224,7 @@ export const getPublicPostById = async (req: Request, res: Response) => {
                         name: true,
                     },
                 },
-                category: {
-                    select: {
-                        name: true,
-                    },
-                },
+                category: true,
             },
         });
 

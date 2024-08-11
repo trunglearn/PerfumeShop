@@ -1,0 +1,43 @@
+@startuml
+
+actor User
+participant "LoginPopup" as LoginPopup
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+User -> LoginPopup: Open Login Pop-up
+LoginPopup -> Controller: Request Login Form
+Controller -> Model: Fetch Login Form
+Model -> Controller: Send Login Form
+Controller -> LoginPopup: Display Login Form
+
+User -> LoginPopup: Enter Email & Password
+LoginPopup -> Controller: Submit Login Credentials
+Controller -> Model: Validate Credentials
+Model -> Database: Check Credentials
+Database -> Model: Return Validation Result
+Model -> Controller: Send Validation Result
+Controller -> LoginPopup: Display Login Result
+
+alt Invalid Credentials
+    LoginPopup -> User: Show Error Message
+else Valid Credentials
+    LoginPopup -> User: Redirect to Homepage
+end
+
+User -> LoginPopup: Select Register New Account
+LoginPopup -> Controller: Request Registration Form
+Controller -> Model: Fetch Registration Form
+Model -> Controller: Send Registration Form
+Controller -> LoginPopup: Display Registration Form
+
+
+User -> LoginPopup: Select Reset Password
+LoginPopup -> Controller: Request Password Reset Form
+Controller -> Model: Fetch Password Reset Form
+Model -> Controller: Send Password Reset Form
+Controller -> LoginPopup: Display Password Reset Form
+
+
+@enduml

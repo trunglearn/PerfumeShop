@@ -1,0 +1,74 @@
+@startuml
+actor User
+participant "ListBlogPage" as ListBlogPage
+participant "Sidebar" as Sidebar
+participant "HeaderBar" as HeaderBar
+participant "BlogContent" as BlogContent
+participant "BlogAPI" as BlogAPI
+participant "BlogController" as BlogController
+participant "Database" as Database
+
+== Display Blog List ==
+User -> ListBlogPage: Access Blog List Page
+activate ListBlogPage
+
+ListBlogPage -> Sidebar: Load Sidebar
+activate Sidebar
+Sidebar -> BlogAPI: get(`post-categories` and `latest-posts`)
+activate BlogAPI
+BlogAPI -> BlogController: getCategoriesAndLatestPosts()
+activate BlogController
+BlogController -> Database: db.post.findMany({categories, latest})
+Database --> BlogController: Return categories and latest posts
+deactivate BlogController
+
+BlogController --> BlogAPI: Return categories and latest posts
+deactivate BlogAPI
+
+BlogAPI --> Sidebar: Return categories and latest posts
+deactivate Sidebar
+
+Sidebar --> ListBlogPage: Display categories and latest posts
+
+ListBlogPage -> HeaderBar: Load HeaderBar
+activate HeaderBar
+HeaderBar -> ListBlogPage: Display sorting options
+deactivate HeaderBar
+
+ListBlogPage -> BlogContent: Load BlogContent
+activate BlogContent
+BlogContent -> BlogAPI: get(`posts?page=x&sort=y&filter=z`)
+activate BlogAPI
+BlogAPI -> BlogController: getPosts(page, sort, filter)
+activate BlogController
+BlogController -> Database: db.post.findMany({page, sort, filter})
+Database --> BlogController: Return posts
+deactivate BlogController
+
+BlogController --> BlogAPI: Return posts
+deactivate BlogAPI
+
+BlogAPI --> BlogContent: Return posts
+deactivate BlogContent
+
+BlogContent --> ListBlogPage: Display posts
+
+== Search Blog Posts ==
+User -> ListBlogPage: Search for posts
+activate ListBlogPage
+ListBlogPage -> BlogAPI: get(`posts?search=query`)
+activate BlogAPI
+BlogAPI -> BlogController: searchPosts(query)
+activate BlogController
+BlogController -> Database: db.post.findMany({search: query})
+Database --> BlogController: Return search results
+deactivate BlogController
+
+BlogController --> BlogAPI: Return search results
+deactivate BlogAPI
+
+BlogAPI --> ListBlogPage: Return search results
+deactivate ListBlogPage
+
+ListBlogPage --> User: Display search results
+@enduml

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
@@ -23,24 +22,24 @@ const request = axios.create({
     },
 });
 
-export const get = async (path: string, req?: AxiosRequestConfig<any>) => {
+export const get = async <T>(path: string, req?: AxiosRequestConfig<T>) => {
     const response = await request.get(path, req);
     return response;
 };
 
-export const post = async (
+export const post = async <T>(
     path: string,
-    req?: any,
-    headers?: AxiosRequestConfig<AxiosRequestConfig<any>>
+    req?: T,
+    headers?: AxiosRequestConfig<T>
 ) => {
     const response = await request.post(path, req, headers);
     return response;
 };
 
-export const put = async (
+export const put = async <T>(
     path: string,
-    req: any,
-    headers?: AxiosRequestConfig<AxiosRequestConfig<any>>
+    req: T,
+    headers?: AxiosRequestConfig<T>
 ) => {
     const response = await request.put(path, req, headers);
     return response;

@@ -1,3 +1,5 @@
+import { PostCategoryType } from 'common/types/post';
+
 export const RATING_LIST = [
     { id: 0, value: 0 },
     { id: 1, value: 1 },
@@ -7,12 +9,53 @@ export const RATING_LIST = [
     { id: 5, value: 5 },
 ];
 
+export const ORDER_STATUS = [
+    { id: 'PAYMENT_PENDING', value: 'PAYMENT_PENDING' },
+    { id: 'PAID', value: 'PAID' },
+    { id: 'PENDING', value: 'PENDING' },
+    { id: 'CONFIRMED', value: 'CONFIRMED' },
+    { id: 'DELIVERING', value: 'DELIVERING' },
+    { id: 'DELIVERED', value: 'DELIVERED' },
+    { id: 'CANCELED', value: 'CANCELED' },
+];
+
+export const CUSTOMER_STATUS = [
+    {
+        value: 'NEWLY_REGISTER',
+    },
+    {
+        value: 'NEWLY_BOUGHT',
+    },
+    {
+        value: 'BANNED',
+    },
+];
+
+export const USER_GENDER = [
+    {
+        value: 'MALE',
+    },
+    {
+        value: 'FEMALE',
+    },
+];
+
 export const RATING_LIST_CLIENT = [
     { id: 5, value: 5 },
     { id: 4, value: 4 },
     { id: 3, value: 3 },
     { id: 2, value: 2 },
     { id: 1, value: 1 },
+];
+
+type PostCategoryConstant = {
+    id: PostCategoryType;
+    value: PostCategoryType;
+};
+
+export const POST_CATEGORY: PostCategoryConstant[] = [
+    { id: 'REVIEW', value: 'REVIEW' },
+    { id: 'NEWS', value: 'NEWS' },
 ];
 
 export const FILTER_LIST = [
@@ -76,4 +119,7 @@ export const FILTER_LIST = [
 
 export const PAGE_SIZE = 5;
 
+export const PAGE_SIZE_CLIENT = 10;
+
 export const PAGE_SIZE_CLIENT_PRODUCT = 12;
+export const PAGE_SIZE_CLIENT_BLOG = 12;

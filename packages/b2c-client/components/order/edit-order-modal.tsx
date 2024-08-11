@@ -11,7 +11,7 @@ type Props = {
     name: string;
     gender: string;
     email: string;
-    phoneNumber: string;
+    phone: string;
     reload: () => void;
 };
 
@@ -20,7 +20,7 @@ type FormType = {
     name: string;
     gender: string;
     email: string;
-    phoneNumber: string;
+    phone: string;
 };
 
 const EditOrderModal: React.FC<Props> = ({
@@ -29,7 +29,7 @@ const EditOrderModal: React.FC<Props> = ({
     name,
     gender,
     email,
-    phoneNumber,
+    phone,
     reload,
 }) => {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const EditOrderModal: React.FC<Props> = ({
             name,
             gender: genderType[gender as keyof typeof genderType],
             email,
-            phoneNumber,
+            phone,
         });
     }, [isOpenModal, orderId]);
 
@@ -51,7 +51,7 @@ const EditOrderModal: React.FC<Props> = ({
             name: string;
             gender: string;
             email: string;
-            phoneNumber: string;
+            phone: string;
         }) =>
             request
                 .put(`my-order/edit/${orderId}`, data)
@@ -76,7 +76,7 @@ const EditOrderModal: React.FC<Props> = ({
                 Object.values(genderType).indexOf(values.gender)
             ],
             email: values.email,
-            phoneNumber: values.phoneNumber,
+            phone: values.phone,
         });
     };
 
@@ -90,7 +90,7 @@ const EditOrderModal: React.FC<Props> = ({
                 role="presentation"
                 style={{ width: '200px', zIndex: '20' }}
             >
-                <Button type="link">Sửa</Button>
+                <Button>Chỉnh sửa thông tin nhận hàng</Button>
             </div>
 
             <Modal
@@ -135,7 +135,7 @@ const EditOrderModal: React.FC<Props> = ({
                             </Form.Item>
                             <Form.Item<FormType>
                                 label="Số điện thoại"
-                                name="phoneNumber"
+                                name="phone"
                             >
                                 <Input size="large" />
                             </Form.Item>

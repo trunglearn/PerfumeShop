@@ -1,0 +1,24 @@
+@startuml
+actor Marketer
+participant "PostList" as PostListPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+
+
+Marketer -> PostListPage: View Post Details
+activate PostListPage
+PostListPage -> Controller: getPostDetails(postId)
+activate Controller
+Controller -> Model: getPostDetails(postId)
+activate Model
+Model -> Database: db.post.findUnique({id: postId})
+Database --> Model: Return post details
+Model --> Controller: Return post details
+deactivate Model
+Controller --> PostListPage: Return post details
+deactivate Controller
+PostListPage --> Marketer: Display posts
+deactivate PostListPage
+@enduml

@@ -6,13 +6,34 @@ import {
     getListCategoryManage,
     updateCategory,
 } from '../controllers/category/cms-category';
+import { isAuthenticated, isMarketer } from '../../middlewares';
 
 export default (router: Router) => {
     // Auth route
-    router.get('/manage/category', getListCategoryManage);
-    router.post('/category/create', createCategory);
-    router.put('/category/update/:id', updateCategory);
-    router.delete('/category/delete/:id', deleteCategory);
+    router.get(
+        '/manage/category',
+        isAuthenticated,
+        isMarketer,
+        getListCategoryManage
+    );
+    router.post(
+        '/category/create',
+        isAuthenticated,
+        isMarketer,
+        createCategory
+    );
+    router.put(
+        '/category/update/:id',
+        isAuthenticated,
+        isMarketer,
+        updateCategory
+    );
+    router.delete(
+        '/category/delete/:id',
+        isAuthenticated,
+        isMarketer,
+        deleteCategory
+    );
 
     // Public route
     router.get('/category', getListCategory);

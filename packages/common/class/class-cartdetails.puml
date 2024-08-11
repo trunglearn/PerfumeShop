@@ -1,0 +1,55 @@
+@startuml
+
+hide stereotype
+hide circle
+skinparam classAttributeIconSize 0
+
+class Cart {
+  +id: String
+  +quantity: Int
+  +userId: String
+  +productId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+  +totalCost: Float
+  --
+  +getTotalCost(): Float
+  +updateQuantity(newQuantity: Int): void
+}
+
+class Product {
+  +id: String
+  +title: String
+  +price: Float
+  +description: String
+  +category: String
+  +image: String
+  --
+  +updatePrice(newPrice: Float): void
+}
+
+class User {
+  +id: String
+  +name: String
+  +email: String
+  +password: String
+  --
+  +register(email: String, password: String): void
+  +login(email: String, password: String): Boolean
+}
+
+class CartDetailsPage {
+  +cartDetails: List<Cart>
+  +totalOrderPrice: Float
+  --
+  +displayCartDetails(): void
+  +changeProductQuantity(productId: String, newQuantity: Int): void
+  +removeProduct(productId: String): void
+}
+
+' Mối quan hệ giữa các lớp
+CartDetailsPage -- Cart
+Cart -- Product
+Cart -- User 
+
+@enduml

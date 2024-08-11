@@ -1,0 +1,45 @@
+@startuml
+
+actor User
+participant "ProductListPage" as ProductPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+User -> ProductPage: Access Product Information Page
+ProductPage -> Controller: Request Product Information
+Controller -> Model: Fetch Product Information
+Model -> Database: Query Product Information
+Database -> Model: Return Product Information
+Model -> Controller: Send Product Information
+Controller -> ProductPage: Display Product Information
+
+User -> ProductPage: Select Add New Product
+ProductPage -> Controller: Request Add New Product Form
+Controller -> Model: Fetch Add Product Form
+Model -> Database: Retrieve Necessary Data
+Model -> Controller: Send Add Product Form
+Controller -> ProductPage: Display Add Product Form
+
+User -> ProductPage: Submit New Product Details
+ProductPage -> Controller: Submit New Product Details
+Controller -> Model: Save New Product Details
+Model -> Database: Store New Product Details
+Model -> Controller: Confirm Product Addition
+Controller -> ProductPage: Display Product Addition Confirmation
+
+User -> ProductPage: Select Edit Product
+ProductPage -> Controller: Request Edit Product Form
+Controller -> Model: Fetch Product Details for Edit
+Model -> Database: Retrieve Product Details
+Model -> Controller: Send Edit Product Form
+Controller -> ProductPage: Display Edit Product Form
+
+User -> ProductPage: Submit Edited Product Details
+ProductPage -> Controller: Submit Edited Product Details
+Controller -> Model: Update Product Details
+Model -> Database: Update Product Details
+Model -> Controller: Confirm Product Update
+Controller -> ProductPage: Display Product Update Confirmation
+
+@enduml

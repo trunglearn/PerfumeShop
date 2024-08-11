@@ -9,6 +9,7 @@ import {
     Space,
     Spin,
     Table,
+    TableColumnsType,
     Tooltip,
 } from 'antd';
 import { useQuery } from '@tanstack/react-query';
@@ -18,6 +19,8 @@ import moment from 'moment';
 import { Brand } from '~/types/product';
 import BrandModal from './brand-modal';
 import Header from '~/components/header';
+import { QueryResponseType } from '~/types';
+import DeleteBrand from './delete-brand';
 
 type FormType = {
     search?: string;
@@ -57,7 +60,9 @@ const ListBrand = () => {
         sortOrder: '',
     });
 
-    const { data, error, isLoading, refetch } = useQuery({
+    const { data, error, isLoading, refetch } = useQuery<
+        QueryResponseType<Brand>
+    >({
         queryKey: ['list-brand'],
         queryFn: () =>
             request
@@ -71,7 +76,7 @@ const ListBrand = () => {
                 .then((res) => res.data),
     });
 
-    const columns = [
+    const columns: TableColumnsType<Brand> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -86,46 +91,44 @@ const ListBrand = () => {
             title: 'Create At',
             dataIndex: 'createdAt',
             key: 'createdAt',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            render: (_: any, record: Brand) => (
-                <p>
-                    {record?.createdAt &&
-                        moment(record.createdAt).format('YYYY-MM-DD')}
-                </p>
+
+            render: (value) => (
+                <p>{value && moment(value).format('YYYY-MM-DD')}</p>
             ),
         },
         {
             title: 'Update At',
             dataIndex: 'updatedAt',
             key: 'updatedAt',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            render: (_: any, record: Brand) => (
-                <p>
-                    {record?.updatedAt &&
-                        moment(record.updatedAt).format('YYYY-MM-DD')}
-                </p>
+            render: (value) => (
+                <p>{value && moment(value).format('YYYY-MM-DD')}</p>
             ),
         },
         {
             title: 'Actions',
             key: 'actions',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            render: (_: any, record: Brand) => (
+            render: (_, record) => (
                 <Space size="middle">
-                    <Tooltip arrow={false} color="#108ee9" title="Edit brand">
-                        <BrandModal
-                            brandId={record.id ?? ''}
-                            button={
+                    <BrandModal
+                        brandId={record.id ?? ''}
+                        button={
+                            <Tooltip title="Edit">
                                 <Button
                                     icon={<EditOutlined />}
                                     shape="circle"
                                     type="link"
                                 />
-                            }
-                            reloadList={() => refetch()}
-                            title="Edit brand"
-                        />
-                    </Tooltip>
+                            </Tooltip>
+                        }
+                        reloadList={() => refetch()}
+                        title="Edit brand"
+                    />
+
+                    <DeleteBrand
+                        brandId={record.id ?? ''}
+                        brandName={record.name ?? ''}
+                        reloadList={() => refetch()}
+                    />
                 </Space>
             ),
         },
@@ -160,6 +163,9 @@ const ListBrand = () => {
                     <div className="grid grid-cols-3 gap-5">
                         <Form.Item label="Sort by" name="sortBy">
                             <Select defaultValue="">
+                                <Select.Option default value="">
+                                    Select a order...
+                                </Select.Option>
                                 {SORT_LIST?.map((item) => (
                                     <Select.Option
                                         key={item.key}
@@ -168,9 +174,6 @@ const ListBrand = () => {
                                         {item.label}
                                     </Select.Option>
                                 ))}
-                                <Select.Option default value="">
-                                    Select a order...
-                                </Select.Option>
                             </Select>
                         </Form.Item>
                         <Form.Item label="Sort order" name="sortOrder">
@@ -234,7 +237,9 @@ const ListBrand = () => {
                                     refetch();
                                 });
                             }}
-                            pageSize={5}
+                            pageSize={paginationValue.pageSize}
+                            pageSizeOptions={[5, 10, 20, 50]}
+                            showSizeChanger
                             total={data?.pagination?.total}
                         />
                     ) : null}

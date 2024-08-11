@@ -1,0 +1,52 @@
+@startuml
+
+actor User
+participant "Order Infomation Page" as OrderInfomationPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+User -> OrderInfomationPage: Access Order Details Page
+OrderInfomationPage -> Controller: Request Order Details Page
+Controller -> Model: Fetch Order Details
+Model -> Database: Query Order Information
+Database -> Model: Return Order Information
+Model -> Controller: Send Order Details
+Controller -> OrderInfomationPage: Display Order Details
+
+User -> OrderInfomationPage: Select Re-Buy Product
+OrderInfomationPage -> Controller: Request Re-Buy Product
+Controller -> Model: Process Re-Buy Request
+Model -> Database: Update Order Information
+Model -> Controller: Confirm Re-Buy
+Controller -> OrderInfomationPage: Display Re-Buy Confirmation
+
+User -> OrderInfomationPage: Select Give Feedback
+OrderInfomationPage -> Controller: Request Feedback Form
+Controller -> Model: Fetch Feedback Form
+Model -> Database: Retrieve Product Information
+Model -> Controller: Send Feedback Form
+Controller -> OrderInfomationPage: Display Feedback Form
+
+User -> OrderInfomationPage: Submit Feedback
+OrderInfomationPage -> Controller: Submit Feedback Form
+Controller -> Model: Save Feedback
+Model -> Database: Store Feedback
+Model -> Controller: Confirm Feedback Submission
+Controller -> OrderInfomationPage: Display Feedback Confirmation
+
+User -> OrderInfomationPage: Select Update Order
+OrderInfomationPage -> Controller: Request Update Order
+Controller -> Model: Fetch Order Information
+Model -> Database: Retrieve Order Details
+Model -> Controller: Redirect to Cart Details Page
+Controller -> OrderInfomationPage: Display Cart Details Page
+
+User -> OrderInfomationPage: Select Cancel Order
+OrderInfomationPage -> Controller: Request Cancel Order
+Controller -> Model: Process Cancel Order
+Model -> Database: Update Order Status
+Model -> Controller: Confirm Order Cancellation
+Controller -> OrderInfomationPage: Display Order Cancellation Confirmation
+
+@enduml

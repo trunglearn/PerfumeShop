@@ -4,3 +4,5 @@ export type LatestPost = {
     thumbnail: string | null;
     title: string | null;
 };
+
+export type PostCategoryType = 'NEWS' | 'REVIEW';

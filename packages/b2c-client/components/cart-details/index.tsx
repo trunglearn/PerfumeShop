@@ -1,9 +1,10 @@
 /* eslint-disable max-lines */
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Button, Card, Checkbox, Col, Layout, Row } from 'antd';
+import { Button, Card, Checkbox, Col, Layout, Modal, Row } from 'antd';
 import { QueryResponseType } from 'common/types';
 import { Cart } from 'common/types/cart';
+import { Product } from 'common/types/product';
 import { currencyFormatter } from 'common/utils/formatter';
 import * as request from 'common/utils/http-request';
 import Image from 'next/image';
@@ -12,7 +13,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from '~/hooks/useAuth';
 import useCartStore from '~/hooks/useCartStore';
-import CartStoreItem from './cart-list';
 import DeleteCartProductFormModal from './delete-cart-product';
 
 const { Content } = Layout;
@@ -26,9 +26,8 @@ const CartDetails = () => {
     // Initialize cartItems from localStorage or default to empty array
     const [cartItems, setCartItems] = useState<Cart[]>([]);
 
-    const { data: cartStorage } = useCartStore();
-
     const itemKeysQuery = query.itemKeys as string;
+
     const [selectedItems, setSelectedItems] = useState<
         {
             id: string;
@@ -37,29 +36,31 @@ const CartDetails = () => {
     >([]);
 
     const [totalCartPrice, setTotalCartPrice] = useState(0);
+    const {
+        data: cartStorage,
+        deleteProduct,
+        updateProductQuantity,
+    } = useCartStore();
 
-    const { data: listProductCart, isLoading: isLoadingListProductCart } =
-        useQuery<
-            QueryResponseType<{
-                id: string;
-                discount_price: number;
-                original_price: number;
-            }>
-        >({
-            queryKey: ['list_product_cart'],
-            queryFn: async () => {
-                return request
-                    .get('/list-product-cart', {
-                        params: {
-                            listProductId: cartStorage.map(
-                                (cart) => cart.productId
-                            ),
-                        },
-                    })
-                    .then((res) => res.data);
-            },
-            enabled: cartStorage.length > 0,
-        });
+    const {
+        data: listCartItemsStore,
+        isLoading: isLoadinglistCartItemsStore,
+        refetch: listCartItemsStoreRefetch,
+    } = useQuery<QueryResponseType<Product>>({
+        queryKey: ['list_product_cart'],
+        queryFn: async () => {
+            return request
+                .get('/list-product-cart', {
+                    params: {
+                        listProductId: cartStorage.map(
+                            (cart) => cart.productId
+                        ),
+                    },
+                })
+                .then((res) => res.data);
+        },
+        enabled: cartStorage.length > 0,
+    });
 
     const { data: cartData, refetch: refetchCart } = useQuery<
         QueryResponseType<Cart>
@@ -82,21 +83,9 @@ const CartDetails = () => {
         },
     });
 
-    const { mutate: addCart } = useMutation({
-        mutationFn: async (dataAddCart: {
-            productId: string;
-            quantity: number;
-        }) => {
-            return request.post('/cart/add', dataAddCart);
-        },
-        onSuccess: () => {
-            refetchCart(); // Corrected function name
-        },
-    });
-
     useEffect(() => {
-        if (listProductCart?.data) {
-            const total = listProductCart.data.reduce((acc, cur) => {
+        if (listCartItemsStore?.data) {
+            const total = listCartItemsStore.data.reduce((acc, cur) => {
                 const cartItem = cartStorage.find(
                     (item) => item.productId === cur.id
                 );
@@ -111,7 +100,7 @@ const CartDetails = () => {
         } else {
             setTotalCartPrice(0);
         }
-    }, [listProductCart, cartStorage, isLoadingListProductCart]);
+    }, [listCartItemsStore, cartStorage, isLoadinglistCartItemsStore]);
 
     useEffect(() => {
         if (auth) {
@@ -145,7 +134,6 @@ const CartDetails = () => {
 
             return item;
         });
-
         setCartItems(updatedCartItems); // Update state
     };
 
@@ -165,21 +153,13 @@ const CartDetails = () => {
             product.forEach((e: string) => {
                 const [id, quantity] = e.split(':');
 
-                if (!cartItems.some((item) => item.product?.id === id)) {
-                    addCart({
-                        productId: id,
-                        quantity: Number(quantity),
-                    });
-                    refetchCart();
-                }
-
                 setSelectedItems((prevSelectedItems) => [
                     ...prevSelectedItems,
                     { id, quantity },
                 ]);
             });
         }
-    }, [itemKeysQuery, cartItems, addCart, refetchCart]);
+    }, [itemKeysQuery, cartItems]);
 
     const handleCheckboxChange = (id: string, checked: boolean) => {
         setSelectedItems((prevSelectedItems) => {
@@ -190,6 +170,18 @@ const CartDetails = () => {
         });
     };
 
+    const handlePurchase = () => {
+        const queryString = selectedItems?.map((e) => `${e.id}`).join(',');
+        if (queryString === null || queryString === '') {
+            Modal.warn({
+                content: 'Vui lòng chọn sản phẩm để tiến hành đặt hàng.',
+                okText: 'Trở lại',
+            });
+            return;
+        }
+        router.push(`/cart-contact?itemKeys=${queryString}`);
+    };
+
     if (!auth) {
         return (
             <Layout>
@@ -198,12 +190,235 @@ const CartDetails = () => {
                         <Content>
                             <Row gutter={16}>
                                 <Col span={16}>
-                                    {cartItems?.map((item) => (
-                                        <CartStoreItem
-                                            key={item?.productId}
-                                            productId={item.productId ?? ''}
-                                            quantity={item.quantity ?? 0}
-                                        />
+                                    {listCartItemsStore?.data?.map((item) => (
+                                        <Card
+                                            bordered={false}
+                                            extra={
+                                                <Button
+                                                    danger
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={async () => {
+                                                        await deleteProduct(
+                                                            item?.id ?? ''
+                                                        );
+                                                        listCartItemsStoreRefetch();
+                                                    }}
+                                                />
+                                            }
+                                            style={{
+                                                marginBottom: 10,
+                                                marginLeft: 10,
+                                            }}
+                                            title={
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={selectedItems.some(
+                                                            (e) =>
+                                                                e.id === item.id
+                                                        )}
+                                                        onChange={(e) =>
+                                                            handleCheckboxChange(
+                                                                item?.id ?? '',
+                                                                e.target.checked
+                                                            )
+                                                        }
+                                                        value={item?.id}
+                                                    />
+                                                    {` Mã sản phẩm:  ${item?.id}`}
+                                                </div>
+                                            }
+                                        >
+                                            <Content>
+                                                <Row gutter={16}>
+                                                    <Col span={6}>
+                                                        <div
+                                                            style={{
+                                                                height: 150,
+                                                            }}
+                                                        >
+                                                            <Image
+                                                                alt=""
+                                                                className="shadow-lg"
+                                                                layout="fill"
+                                                                objectFit="cover"
+                                                                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}${item?.thumbnail}`}
+                                                            />
+                                                        </div>
+                                                    </Col>
+                                                    <Col span={8}>
+                                                        <div className="relative flex justify-center text-xl font-semibold">
+                                                            {item?.name}
+                                                        </div>
+                                                        <div className="relative top-2 flex justify-center">
+                                                            <div>
+                                                                <div className="text-center">
+                                                                    Số lượng
+                                                                </div>
+                                                                <div
+                                                                    className="max-sm: relative top-1 flex border-spacing-2 justify-evenly backdrop-brightness-90"
+                                                                    style={{
+                                                                        borderRadius: 10,
+                                                                        width: 100,
+                                                                    }}
+                                                                >
+                                                                    <Button
+                                                                        block
+                                                                        icon={
+                                                                            <MinusOutlined />
+                                                                        }
+                                                                        onClick={() =>
+                                                                            updateProductQuantity(
+                                                                                {
+                                                                                    productId:
+                                                                                        item?.id ??
+                                                                                        '',
+                                                                                    quantity:
+                                                                                        (cartStorage.find(
+                                                                                            (
+                                                                                                e
+                                                                                            ) =>
+                                                                                                e.productId ===
+                                                                                                item.id
+                                                                                        )
+                                                                                            ?.quantity ??
+                                                                                            0) >
+                                                                                        0
+                                                                                            ? (cartStorage.find(
+                                                                                                  (
+                                                                                                      e
+                                                                                                  ) =>
+                                                                                                      e.productId ===
+                                                                                                      item.id
+                                                                                              )
+                                                                                                  ?.quantity ??
+                                                                                                  0) -
+                                                                                              1
+                                                                                            : 0,
+                                                                                },
+                                                                                cartStorage.find(
+                                                                                    (
+                                                                                        e
+                                                                                    ) =>
+                                                                                        e.productId ===
+                                                                                        item.id
+                                                                                )
+                                                                                    ?.quantity ??
+                                                                                    0
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <span className="mx-2 flex items-center">
+                                                                        {
+                                                                            cartStorage.find(
+                                                                                (
+                                                                                    e
+                                                                                ) =>
+                                                                                    e.productId ===
+                                                                                    item.id
+                                                                            )
+                                                                                ?.quantity
+                                                                        }
+                                                                    </span>
+                                                                    <Button
+                                                                        block
+                                                                        icon={
+                                                                            <PlusOutlined />
+                                                                        }
+                                                                        onClick={() =>
+                                                                            updateProductQuantity(
+                                                                                {
+                                                                                    productId:
+                                                                                        item?.id ??
+                                                                                        '',
+                                                                                    quantity:
+                                                                                        (cartStorage.find(
+                                                                                            (
+                                                                                                e
+                                                                                            ) =>
+                                                                                                e.productId ===
+                                                                                                item.id
+                                                                                        )
+                                                                                            ?.quantity ??
+                                                                                            0) >
+                                                                                        0
+                                                                                            ? (cartStorage.find(
+                                                                                                  (
+                                                                                                      e
+                                                                                                  ) =>
+                                                                                                      e.productId ===
+                                                                                                      item.id
+                                                                                              )
+                                                                                                  ?.quantity ??
+                                                                                                  0) +
+                                                                                              1
+                                                                                            : 0,
+                                                                                },
+                                                                                item?.quantity ??
+                                                                                    0
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                    <Col span={8}>
+                                                        <div
+                                                            style={{
+                                                                marginTop: 38,
+                                                            }}
+                                                        >
+                                                            <div className="flex justify-evenly">
+                                                                <div>
+                                                                    <div>
+                                                                        Giá
+                                                                    </div>
+                                                                    <div className="text-lg font-semibold">
+                                                                        {currencyFormatter(
+                                                                            item?.discount_price ??
+                                                                                item?.original_price ??
+                                                                                0
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div>
+                                                                        Tổng
+                                                                    </div>
+                                                                    <div className="text-lg font-semibold">
+                                                                        {currencyFormatter(
+                                                                            (cartStorage.find(
+                                                                                (
+                                                                                    e
+                                                                                ) =>
+                                                                                    e.productId ===
+                                                                                    item.id
+                                                                            )
+                                                                                ?.quantity ??
+                                                                                0) >
+                                                                                0
+                                                                                ? (cartStorage.find(
+                                                                                      (
+                                                                                          e
+                                                                                      ) =>
+                                                                                          e.productId ===
+                                                                                          item.id
+                                                                                  )
+                                                                                      ?.quantity ??
+                                                                                      0) *
+                                                                                      (item?.discount_price ??
+                                                                                          item?.original_price ??
+                                                                                          0)
+                                                                                : 0
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                            </Content>
+                                        </Card>
                                     ))}
                                 </Col>
                                 <Col span={8}>
@@ -234,9 +449,7 @@ const CartDetails = () => {
                                         </Link>
                                         <Button
                                             block
-                                            onClick={() =>
-                                                router.push('/cart-contact')
-                                            }
+                                            onClick={handlePurchase}
                                             size="large"
                                             type="primary"
                                         >
@@ -440,9 +653,7 @@ const CartDetails = () => {
                                     </Link>
                                     <Button
                                         block
-                                        onClick={() =>
-                                            router.push('/cart-contact')
-                                        }
+                                        onClick={handlePurchase}
                                         size="large"
                                         type="primary"
                                     >

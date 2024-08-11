@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { Alert, Button, Form, Input, Select } from 'antd';
+import { Alert, Button, Form, Input, Select, Spin, Typography } from 'antd';
 import { AxiosError, AxiosResponse } from 'axios';
 import Modal from 'common/components/modal';
 import * as request from 'common/utils/http-request';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import useLoginModal from '~/hooks/useLoginModal';
 import useRegisterModal from '~/hooks/useRegisterModal';
@@ -16,16 +16,30 @@ const genderOptions = {
 const RegisterModal = () => {
     const [emailUser, setEmailUser] = useState('');
     const [form] = Form.useForm();
-
     const { isOpen, onClose } = useRegisterModal();
     const { onOpen } = useLoginModal();
-
     const [loading, setLoading] = useState(false);
+    const [secondsToGo, setSecondsToGo] = useState(0);
+    const { Paragraph, Text } = Typography;
 
     const toggle = useCallback(() => {
         onClose();
         onOpen();
     }, [onClose, onOpen]);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            if (secondsToGo > 0) {
+                setSecondsToGo(secondsToGo - 1);
+            }
+            if (secondsToGo === 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+        return () => {
+            clearInterval(timer);
+        };
+    });
 
     const { mutate: verifyEmail, isPending: verifyEmailIsPending } =
         useMutation({
@@ -101,14 +115,15 @@ const RegisterModal = () => {
 
     const handleResendEmail = () => {
         verifyEmail(emailUser);
+        setSecondsToGo(60);
     };
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
             <div className="text-center">
-                <div className="text-2xl font-bold">Create an account!</div>
+                <div className="text-2xl font-bold">Tạo tài khoản!</div>
                 <div className="mt-2 font-light text-neutral-500">
-                    Welcome to Perfume Shop
+                    Chào mừng bạn đến với Perfume Shop
                 </div>
             </div>
             <Form
@@ -126,7 +141,11 @@ const RegisterModal = () => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your username!',
+                            message: 'Hãy nhập email của bạn',
+                        },
+                        {
+                            type: 'email',
+                            message: 'Email không hợp lệ',
                         },
                     ]}
                 >
@@ -134,12 +153,16 @@ const RegisterModal = () => {
                 </Form.Item>
                 <Form.Item
                     hasFeedback
-                    label="Password"
+                    label="Mật khẩu"
                     name="password"
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your password!',
+                            message: 'Hãy nhập mật khẩu của bạn',
+                        },
+                        {
+                            min: 8,
+                            message: 'Mật khẩu phải ít nhất 8 kí tự',
                         },
                     ]}
                 >
@@ -148,13 +171,14 @@ const RegisterModal = () => {
                 <Form.Item
                     dependencies={['password']}
                     hasFeedback
-                    label="Confirm Password"
+                    label="Xác nhận mật khẩu"
                     name="confirmPassword"
                     rules={[
                         {
                             required: true,
-                            message: 'Please confirm your password!',
+                            message: 'Hãy xác nhận mật khẩu của bạn',
                         },
+
                         ({ getFieldValue }) => ({
                             validator(_, value) {
                                 if (
@@ -165,7 +189,7 @@ const RegisterModal = () => {
                                 }
                                 return Promise.reject(
                                     new Error(
-                                        'The new password that you entered do not match!'
+                                        'Mật khẩu xác nhận không trùng khớp'
                                     )
                                 );
                             },
@@ -175,36 +199,36 @@ const RegisterModal = () => {
                     <Input.Password size="large" />
                 </Form.Item>
                 <Form.Item
-                    label="Name"
+                    label="Tên"
                     name="name"
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your name!',
+                            message: 'Hãy nhập tên của bạn',
                         },
                     ]}
                 >
                     <Input size="large" />
                 </Form.Item>
                 <Form.Item
-                    label="Phone number"
+                    label="Số điện thoại"
                     name="phone"
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your phone number!',
+                            message: 'Hãy nhập số điện thoại của bạn',
                         },
                         {
                             pattern:
                                 /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/,
-                            message: 'Please enter a valid phone number!',
+                            message: 'Số điện thoại không hợp lệ',
                         },
                     ]}
                 >
                     <Input size="large" />
                 </Form.Item>
 
-                <Form.Item label="Gender" name="gender">
+                <Form.Item label="Giới tính" name="gender">
                     <Select size="large">
                         {Object.values(genderOptions).map((item: string) => (
                             <Select.Option
@@ -223,7 +247,7 @@ const RegisterModal = () => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item label="Address" name="address">
+                <Form.Item label="Địa chỉ" name="address">
                     <Input size="large" />
                 </Form.Item>
 
@@ -231,7 +255,7 @@ const RegisterModal = () => {
                     <Button htmlType="submit" />
                 </Form.Item>
             </Form>
-            {registerUserIsSuccess && (
+            {registerUserIsSuccess && secondsToGo === 0 && (
                 <Alert
                     description={
                         <>
@@ -241,17 +265,32 @@ const RegisterModal = () => {
                                     onClick={handleResendEmail}
                                     type="button"
                                 >
-                                    Click here
+                                    Ấn vào đây
                                 </button>
                             </span>
                             <span className="mx-2">
-                                if you have not received the email.
+                                nếu bạn chưa nhận được email xác nhận.
                             </span>
                         </>
                     }
-                    message={`We've been sent email to ${emailUser} to verify your email address and active your account.`}
+                    message={`Chúng tôi đã gửi đến ${emailUser} email xác nhận để kích hoạt tài khoản.`}
                     type="info"
                 />
+            )}
+
+            {secondsToGo > 0 && (
+                <Paragraph className="flex space-x-2 ">
+                    <Spin />
+                    <div className="flex space-x-1">
+                        <span>Gửi email xác thực sau</span>
+                        <Text type="danger">
+                            {Math.floor(secondsToGo / 60)}
+                        </Text>{' '}
+                        <span>phút</span>
+                        <Text type="danger">{secondsToGo % 60}</Text>{' '}
+                        <span>giây</span>
+                    </div>
+                </Paragraph>
             )}
         </div>
     );
@@ -261,13 +300,13 @@ const RegisterModal = () => {
             <hr />
             <div className="mt-4 text-center font-light text-neutral-500">
                 <div className="flex items-center justify-center gap-2">
-                    <div>Already have an account?</div>
+                    <div>Bạn đã có tài khoản?</div>
                     <div
                         className="cursor-pointer text-neutral-800 hover:underline"
                         onClick={toggle}
                         role="presentation"
                     >
-                        Login
+                        Đăng nhập
                     </div>
                 </div>
             </div>
@@ -276,14 +315,14 @@ const RegisterModal = () => {
 
     return (
         <Modal
-            actionLabel="Register"
+            actionLabel="Đăng ký"
             body={bodyContent}
             disabled={loading || verifyEmailIsPending || registerUserIsPending}
             footer={footerContent}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
-            title="Register"
+            title="Đăng ký"
         />
     );
 };

@@ -1,0 +1,25 @@
+@startuml
+actor Marketer
+participant "FeedbackList" as FeedbackListPage
+participant "Controller" as Controller
+participant "Model" as Model
+participant "Database" as Database
+
+Marketer -> FeedbackListPage: Access Feedback List
+activate FeedbackListPage
+
+FeedbackListPage -> Controller: Load Feedback list
+activate Controller
+Controller -> Model: getListFeedbackManage()
+activate Model
+Model -> Database: db.Feedback.findMany({latest})
+Database --> Model: Return latest Feedbacks
+Model --> Controller: Return latest Feedbacks
+deactivate Model
+Controller --> FeedbackListPage: Return Feedbacks
+FeedbackListPage --> Marketer: Display Feedbacks
+deactivate Controller
+deactivate FeedbackListPage
+
+
+@enduml
